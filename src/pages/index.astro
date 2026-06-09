@@ -341,7 +341,7 @@ async function startAnalysis(replaceState = false) {
     updateProgress(20, "Fetching package metadata...");
     const pkgSize = await getBasePackageSize(pkgName);
     const sortedDeps = await getSortedDependents(pkgName, isDev);
-    updateProgress(95, "Calculating traffic and versions...");
+    updateProgress(99, "Calculating traffic and versions...");
 
     currentResults = sortedDeps
       .filter((d) => {

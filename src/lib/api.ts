@@ -1,4 +1,11 @@
-import { liveRegistryUrl, npmRegistryBaseUrl, registryUrl } from "./constants";
+import {
+  liveRegistryUrl,
+  MAX_BATCHES,
+  MIN_BATCH_SIZE,
+  MIN_PACKAGES_FOR_BATCH_MODE,
+  npmRegistryBaseUrl,
+  registryUrl,
+} from "./constants";
 import { updateProgress } from "./ui";
 import { hash } from "./util";
 
@@ -50,22 +57,41 @@ interface DownloadsStats {
 
 async function fetchAllStats(names: string[]) {
   const combinedStats: Record<string, number> = {};
-
-  updateProgress(40, `Fetching stats for ${names.length} packages...`);
-
   const url = `${registryUrl}/_design/downloads/_view/downloads` as const;
 
-  const { data } = await cachedFetch<DownloadsStats>(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ keys: names }),
-  });
+  if (names.length <= MIN_PACKAGES_FOR_BATCH_MODE) {
+    updateProgress(40, `Fetching stats for ${names.length} packages...`);
+    const { data } = await cachedFetch<DownloadsStats>(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ keys: names }),
+    });
+    data.rows.forEach((r) => {
+      combinedStats[r.key] = r.value;
+    });
+  } else {
+    const batchSize = Math.max(
+      MIN_BATCH_SIZE,
+      Math.ceil(names.length / MAX_BATCHES),
+    );
+    const totalBatches = Math.ceil(names.length / batchSize);
 
-  data.rows.forEach((r) => {
-    combinedStats[r.key] = r.value;
-  });
+    for (let i = 0; i < totalBatches; i++) {
+      const pct = Math.round(40 + (i / totalBatches) * 58);
+      updateProgress(pct, `Fetching stats for ${names.length} packages...`);
+      const batch = names.slice(i * batchSize, (i + 1) * batchSize);
+      const { data } = await cachedFetch<DownloadsStats>(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keys: batch }),
+      });
+      data.rows.forEach((r) => {
+        combinedStats[r.key] = r.value;
+      });
+    }
+  }
 
-  updateProgress(90, "Stats fetch complete.");
+  updateProgress(98, "Stats fetch complete.");
   return combinedStats;
 }
 
@@ -126,7 +152,7 @@ async function getSortedDependents(
 
   if (isCached) return data;
 
-  updateProgress(30, "Analyzing dependent list...");
+  updateProgress(30, "Analyzing dependents list...");
 
   const allNames = data.rows.map((r) => r.id);
   const allStats = await fetchAllStats(allNames);
