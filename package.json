@@ -1,0 +1,38 @@
+{
+  "name": "e18e-tools",
+  "type": "module",
+  "private": true,
+  "imports": {
+    "#layout": "./src/layouts/Layout.astro",
+    "#styles": "./src/styles/global.css",
+    "#lib/*": "./src/lib/*.ts"
+  },
+  "scripts": {
+    "lint": "biome check",
+    "format": "biome check --write --linter-enabled=false",
+    "build": "astro build",
+    "deploy": "wrangler deploy",
+    "dev": "astro dev",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "4.3.0",
+    "astro": "6.4.4",
+    "semver": "7.8.3",
+    "tailwindcss": "4.3.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.16",
+    "@gameroman/config": "0.1.0",
+    "typescript": "6.0.3",
+    "wrangler": "4.98.0"
+  },
+  "overrides": {
+    "@babel/helper-module-imports": "7.28.6",
+    "@jridgewell/trace-mapping": "0.3.31",
+    "esbuild": "0.28.0",
+    "is-docker": "4.0.0",
+    "semver": "7.8.0",
+    "unstorage": "2.0.0-alpha.7"
+  }
+}
