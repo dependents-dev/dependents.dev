@@ -30,7 +30,7 @@
   "overrides": {
     "@babel/helper-module-imports": "7.28.6",
     "@jridgewell/trace-mapping": "0.3.31",
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "is-docker": "4.0.0",
     "semver": "7.8.0",
     "unstorage": "2.0.0-alpha.7"
