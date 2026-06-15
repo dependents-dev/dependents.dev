@@ -28,7 +28,7 @@
     "wrangler": "4.98.0"
   },
   "overrides": {
-    "@babel/helper-module-imports": "7.28.6",
+    "@babel/helper-module-imports": "7.29.7",
     "@jridgewell/trace-mapping": "0.3.31",
     "esbuild": "0.28.1",
     "is-docker": "4.0.0",
