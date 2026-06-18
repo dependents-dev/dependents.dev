@@ -25,6 +25,7 @@ export default function App() {
   const [progressStatus, setProgressStatus] = createSignal("");
   const [error, setError] = createSignal("");
   const [results, setResults] = createSignal<AnalysisResult[]>([]);
+  const [copyBtnLabel, setCopyBtnLabel] = createSignal("Copy as Markdown");
 
   let currentResults: AnalysisResult[] = [];
 
@@ -175,9 +176,11 @@ export default function App() {
 
     try {
       await navigator.clipboard.writeText(md);
+      setCopyBtnLabel("Copied!");
     } catch {
-      console.error("Failed to copy to clipboard");
+      setCopyBtnLabel("Failed to copy");
     }
+    setTimeout(() => setCopyBtnLabel("Copy as Markdown"), 1000);
   }
 
   onMount(() => {
@@ -337,7 +340,7 @@ export default function App() {
             </div>
             <button
               id="copyMarkdownBtn"
-              class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-1.5 px-3 rounded border border-slate-300 dark:border-slate-600 transition-colors flex items-center gap-1.5"
+              class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-1.5 px-3 rounded border border-slate-300 dark:border-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer"
               type="button"
               onClick={copyAsMarkdown}
             >
@@ -355,7 +358,7 @@ export default function App() {
                   d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
                 />
               </svg>
-              <span>Copy as Markdown</span>
+              <span>{copyBtnLabel()}</span>
             </button>
           </div>
           <div class="table-container bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
