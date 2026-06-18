@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "imports": {
+    "#app": "./src/components/App.tsx",
     "#layout": "./src/layouts/Layout.astro",
     "#styles": "./src/styles/global.css",
     "#lib/*": "./src/lib/*.ts"

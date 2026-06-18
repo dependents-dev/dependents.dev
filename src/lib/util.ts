@@ -26,9 +26,15 @@ const hash = (str: string) => {
   return (h >>> 0).toString(36);
 };
 
-function getPackageNameAndVersion(input: string) {
+type PackageNameAndVersion = readonly [
+  packageName: string,
+  version?: string | undefined,
+];
+
+function getPackageNameAndVersion(input: string): PackageNameAndVersion {
   const scoped = input.startsWith("@");
   let [packageName, version] = input.split("@");
+  if (!packageName) return [""];
   if (scoped) {
     const atPos = input.lastIndexOf("@");
     if (atPos === 0) {
@@ -39,10 +45,7 @@ function getPackageNameAndVersion(input: string) {
       version = input.slice(atPos + 1);
     }
   }
-  return [packageName, version?.trim()] as [
-    packageName: string,
-    version: string | undefined,
-  ];
+  return [packageName, version?.trim()];
 }
 
 export {
