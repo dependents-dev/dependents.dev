@@ -92,7 +92,7 @@ export default function App() {
     const limit = params.get("limit");
 
     if (pkg) setPkgInput(pkg);
-    if (dev === "true") setIsDev(true);
+    setIsDev(dev === "true");
     if (limit) setLimitInput(limit);
 
     if (pkg) startAnalysis(true);
@@ -311,6 +311,7 @@ export default function App() {
               onChange={(e) => {
                 setIsDev(e.currentTarget.checked);
                 updateUrlParams({ isDev: e.currentTarget.checked });
+                if (pkgInput().trim()) startAnalysis();
               }}
             />
             <span class="text-sm text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">
