@@ -26,6 +26,7 @@ const description =
         <div class="lg:col-span-2">
           <label
             class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
+            for="pkgInput"
             >Package Name (@version optional)</label
           >
           <input
@@ -38,6 +39,7 @@ const description =
         <div>
           <label
             class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
+            for="limitInput"
             >Limit Results (max 3000)</label
           >
           <input
@@ -214,6 +216,7 @@ const description =
     id="copyBuffer"
     class="sr-only"
     aria-hidden="true"
+    tabindex="-1"
     style="position: absolute; left: -9999px"
   ></textarea>
 </Layout>
