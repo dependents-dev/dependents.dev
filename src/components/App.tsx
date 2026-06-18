@@ -1,3 +1,4 @@
+// @ts-expect-error semver has no types
 import semver from "semver";
 import { createSignal, For, onMount, Show } from "solid-js";
 import { getBasePackageSize, getSortedDependents } from "#lib/api";
@@ -16,6 +17,11 @@ interface AnalysisResult {
   traffic: number;
 }
 
+type State =
+  | { status: "initial" }
+  | { status: "no-results" }
+  | { status: "results"; items: AnalysisResult[] };
+
 export default function App() {
   const [pkgInput, setPkgInput] = createSignal("");
   const [limitInput, setLimitInput] = createSignal("200");
@@ -24,13 +30,15 @@ export default function App() {
   const [progressPercent, setProgressPercent] = createSignal(0);
   const [progressStatus, setProgressStatus] = createSignal("");
   const [error, setError] = createSignal("");
-  const [results, setResults] = createSignal<AnalysisResult[]>([]);
+  const [state, setState] = createSignal<State>({ status: "initial" });
   const [copyBtnLabel, setCopyBtnLabel] = createSignal("Copy as Markdown");
 
-  let currentResults: AnalysisResult[] = [];
-
-  const hasResults = () => results().length > 0;
-  const showEmpty = () => !loading() && !error() && !hasResults();
+  const showEmpty = () =>
+    !loading() && !error() && state().status === "no-results";
+  const resultsItems = () => {
+    const s = state();
+    return s.status === "results" ? s.items : [];
+  };
 
   const onProgress = (percent: number, status: string) => {
     setProgressPercent(percent);
@@ -95,7 +103,7 @@ export default function App() {
 
     setLoading(true);
     setError("");
-    setResults([]);
+    setState({ status: "no-results" });
     onProgress(10, "Initializing...");
 
     try {
@@ -119,7 +127,7 @@ export default function App() {
       });
       onProgress(99, "Calculating traffic and versions...");
 
-      currentResults = sortedDeps
+      const items = sortedDeps
         .filter((d) => {
           if (!requestedRange) return true;
           if (d.v === requestedRange) return true;
@@ -138,7 +146,11 @@ export default function App() {
         }))
         .slice(0, limit);
 
-      setResults(currentResults);
+      setState(
+        items.length > 0
+          ? { status: "results", items }
+          : { status: "no-results" },
+      );
       onProgress(100, "Analysis complete");
     } catch (err) {
       console.error(err);
@@ -149,7 +161,8 @@ export default function App() {
   }
 
   async function copyAsMarkdown() {
-    if (!currentResults.length) return;
+    const currentState = state();
+    if (currentState.status !== "results") return;
 
     let md = "";
     if (!isDev()) {
@@ -160,7 +173,7 @@ export default function App() {
       md += "|---|-----------------|---------|\n";
     }
 
-    currentResults.forEach((pkg, i) => {
+    currentState.items.forEach((pkg, i) => {
       const indexStr = `${i + 1}`;
       const downloadsStr = formatDownloads(pkg.downloads);
       const trafficStr = formatTraffic(pkg.traffic);
@@ -241,7 +254,7 @@ export default function App() {
           </div>
           <button
             id="searchBtn"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             type="button"
             onClick={() => startAnalysis()}
             disabled={loading()}
@@ -327,7 +340,7 @@ export default function App() {
         </div>
       </Show>
 
-      <Show when={hasResults()}>
+      <Show when={state().status === "results"}>
         <div>
           <div class="flex justify-between items-center mb-4">
             <div class="flex items-center gap-4">
@@ -335,7 +348,7 @@ export default function App() {
                 Results
               </h2>
               <div class="text-sm text-slate-500 dark:text-slate-400">
-                Showing {results().length} packages
+                Showing {resultsItems().length} packages
               </div>
             </div>
             <button
@@ -377,7 +390,7 @@ export default function App() {
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
-                <For each={results()}>
+                <For each={resultsItems()}>
                   {(pkg, i) => (
                     <tr class="hover:bg-slate-50 transition-colors">
                       <td class="px-6 py-4 text-slate-400 font-medium">
@@ -416,7 +429,7 @@ export default function App() {
         </div>
       </Show>
 
-      <Show when={showEmpty()}>
+      <Show when={state().status === "initial"}>
         <div class="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
           <svg
             class="mx-auto h-12 w-12 text-slate-300 dark:text-slate-700"
@@ -434,6 +447,27 @@ export default function App() {
           </svg>
           <p class="mt-4 text-slate-500 dark:text-slate-400 font-medium">
             Enter a package name to start analysis.
+          </p>
+        </div>
+      </Show>
+      <Show when={showEmpty()}>
+        <div class="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+          <svg
+            class="mx-auto h-12 w-12 text-slate-300 dark:text-slate-700"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            />
+          </svg>
+          <p class="mt-4 text-slate-500 dark:text-slate-400 font-medium">
+            No{isDev() ? " dev" : ""} dependents were found for this package
           </p>
         </div>
       </Show>

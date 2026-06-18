@@ -14,7 +14,8 @@
     "dev": "astro dev",
     "format": "biome check --write --linter-enabled=false",
     "lint": "biome check",
-    "test": "bun test"
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
   },
   "overrides": {
     "@babel/core": "7.29.7",
