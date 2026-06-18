@@ -33,6 +33,7 @@ export default function App() {
   const [state, setState] = createSignal<State>({ status: "initial" });
   const [copyBtnLabel, setCopyBtnLabel] = createSignal("Copy as Markdown");
 
+  const isInitial = () => state().status === "initial";
   const showEmpty = () =>
     !loading() && !error() && state().status === "no-results";
   const resultsItems = () => {
@@ -429,7 +430,7 @@ export default function App() {
         </div>
       </Show>
 
-      <Show when={state().status === "initial"}>
+      <Show when={isInitial() || showEmpty()}>
         <div class="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
           <svg
             class="mx-auto h-12 w-12 text-slate-300 dark:text-slate-700"
@@ -446,28 +447,9 @@ export default function App() {
             />
           </svg>
           <p class="mt-4 text-slate-500 dark:text-slate-400 font-medium">
-            Enter a package name to start analysis.
-          </p>
-        </div>
-      </Show>
-      <Show when={showEmpty()}>
-        <div class="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
-          <svg
-            class="mx-auto h-12 w-12 text-slate-300 dark:text-slate-700"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-            />
-          </svg>
-          <p class="mt-4 text-slate-500 dark:text-slate-400 font-medium">
-            No{isDev() ? " dev" : ""} dependents were found for this package
+            {isInitial()
+              ? "Enter a package name to start analysis."
+              : `No${isDev() ? " dev" : ""} dependents were found for this package`}
           </p>
         </div>
       </Show>
