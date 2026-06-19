@@ -1,5 +1,6 @@
 ---
 import App from "#app";
+import GithubIcon from "#icons/github";
 import Layout from "#layout";
 
 const title = "dependents.dev";
@@ -7,5 +8,24 @@ const description = `dependents.dev - Analyze package dependents, downloads, and
 ---
 
 <Layout {title} {description}>
-  <App client:load />
+  <div class="max-w-6xl mx-auto p-4 md:p-8 relative">
+    <header class="mb-10 text-center">
+      <h1 class="text-4xl font-extrabold text-slate-800 dark:text-white mb-2">
+        dependents.dev
+      </h1>
+      <p class="text-slate-600 dark:text-slate-400 italic">
+        Analyze package dependents, downloads, and traffic across the ecosystem.
+      </p>
+    </header>
+    <a
+      href="/github"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="GitHub"
+      class="absolute top-3 right-3 md:top-5 md:right-5 p-1.5 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+    >
+      <GithubIcon />
+    </a>
+    <App client:load />
+  </div>
 </Layout>
