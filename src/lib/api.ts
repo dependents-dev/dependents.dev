@@ -6,7 +6,6 @@ import {
   npmRegistryBaseUrl,
   registryUrl,
 } from "./constants";
-import { updateProgress } from "./ui";
 import { hash } from "./util";
 
 async function cachedFetch<T, P = T>(url: string, options: RequestInit = {}) {
@@ -55,12 +54,15 @@ interface DownloadsStats {
   rows: DownloadsStatsRow[];
 }
 
-async function fetchAllStats(names: string[]) {
+async function fetchAllStats(
+  names: string[],
+  onProgress: (percent: number, status: string) => void,
+) {
   const combinedStats: Record<string, number> = {};
   const url = `${registryUrl}/_design/downloads/_view/downloads` as const;
 
   if (names.length <= MIN_PACKAGES_FOR_BATCH_MODE) {
-    updateProgress(40, `Fetching stats for ${names.length} packages...`);
+    onProgress(40, `Fetching stats for ${names.length} packages...`);
     const { data } = await cachedFetch<DownloadsStats>(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -78,7 +80,7 @@ async function fetchAllStats(names: string[]) {
 
     for (let i = 0; i < totalBatches; i++) {
       const pct = Math.round(40 + (i / totalBatches) * 58);
-      updateProgress(pct, `Fetching stats for ${names.length} packages...`);
+      onProgress(pct, `Fetching stats for ${names.length} packages...`);
       const batch = names.slice(i * batchSize, (i + 1) * batchSize);
       const { data } = await cachedFetch<DownloadsStats>(url, {
         method: "POST",
@@ -91,7 +93,7 @@ async function fetchAllStats(names: string[]) {
     }
   }
 
-  updateProgress(98, "Stats fetch complete.");
+  onProgress(98, "Stats fetch complete.");
   return combinedStats;
 }
 
@@ -139,9 +141,12 @@ interface ProcessedDependent {
 
 async function getSortedDependents(
   packageName: string,
-  isDev?: boolean,
+  options: {
+    isDev?: boolean;
+    onProgress: (percent: number, status: string) => void;
+  },
 ): Promise<ProcessedDependent[]> {
-  const view = isDev ? "dev-dependencies" : "dependents2";
+  const view = options.isDev ? "dev-dependencies" : "dependents2";
   const url =
     `${liveRegistryUrl}/_design/dependents/_view/${view}?key="${packageName}"` as const;
 
@@ -152,10 +157,10 @@ async function getSortedDependents(
 
   if (isCached) return data;
 
-  updateProgress(30, "Analyzing dependents list...");
+  options.onProgress(30, "Analyzing dependents list...");
 
   const allNames = data.rows.map((r) => r.id);
-  const allStats = await fetchAllStats(allNames);
+  const allStats = await fetchAllStats(allNames, options.onProgress);
 
   const MAX_DEPENDENTS = 3000;
 
