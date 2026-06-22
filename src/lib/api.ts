@@ -1,10 +1,10 @@
 import {
-  liveRegistryUrl,
+  LIVE_REGISTRY_URL,
   MAX_BATCHES,
   MIN_BATCH_SIZE,
   MIN_PACKAGES_FOR_BATCH_MODE,
-  npmRegistryBaseUrl,
-  registryUrl,
+  NPM_REGISTRY_BASE_URL,
+  REGISTRY_URL,
 } from "./constants";
 import { hash } from "./util";
 
@@ -59,7 +59,7 @@ async function fetchAllStats(
   onProgress: (percent: number, status: string) => void,
 ) {
   const combinedStats: Record<string, number> = {};
-  const url = `${registryUrl}/_design/downloads/_view/downloads` as const;
+  const url = `${REGISTRY_URL}/_design/downloads/_view/downloads` as const;
 
   if (names.length <= MIN_PACKAGES_FOR_BATCH_MODE) {
     onProgress(40, `Fetching stats for ${names.length} packages...`);
@@ -107,12 +107,34 @@ interface PackageInfo {
 }
 
 async function getBasePackageSize(name: string): Promise<number> {
-  const url = `${npmRegistryBaseUrl}/${name}/latest` as const;
+  const url = `${NPM_REGISTRY_BASE_URL}/${name}/latest` as const;
   const result = await cachedFetch<PackageInfo>(url);
   if (!result.isCached) {
     result.commit(result.data);
   }
   return result.data.dist?.size || 0;
+}
+
+interface DatabasePackageDeprecated {
+  deprecated: boolean;
+}
+
+interface DatabasePackageDist {
+  unpackedSize: number;
+}
+
+interface DatabasePackageInfo {
+  deprecated?: DatabasePackageDeprecated;
+  dist: DatabasePackageDist;
+}
+
+async function getPackageIsDeprecated(name: string): Promise<boolean> {
+  const url = `${LIVE_REGISTRY_URL}/${name}` as const;
+  const result = await cachedFetch<DatabasePackageInfo>(url);
+  if (!result.isCached) {
+    result.commit(result.data);
+  }
+  return result.data.deprecated?.deprecated ?? false;
 }
 
 interface DevDependentsRow {
@@ -148,7 +170,7 @@ async function getSortedDependents(
 ): Promise<ProcessedDependent[]> {
   const view = options.isDev ? "dev-dependencies" : "dependents2";
   const url =
-    `${liveRegistryUrl}/_design/dependents/_view/${view}?key="${packageName}"` as const;
+    `${LIVE_REGISTRY_URL}/_design/dependents/_view/${view}?key="${packageName}"` as const;
 
   const { data, isCached, commit } = await cachedFetch<
     Dependents,
@@ -178,4 +200,10 @@ async function getSortedDependents(
   return processed;
 }
 
-export { cachedFetch, fetchAllStats, getBasePackageSize, getSortedDependents };
+export {
+  cachedFetch,
+  fetchAllStats,
+  getBasePackageSize,
+  getPackageIsDeprecated,
+  getSortedDependents,
+};
