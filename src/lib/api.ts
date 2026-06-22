@@ -99,7 +99,7 @@ async function fetchAllStats(
 
 interface PackageDist {
   unpackedSize: number;
-  size: number;
+  size?: number;
 }
 
 interface PackageInfo {
@@ -112,7 +112,7 @@ async function getBasePackageSize(name: string): Promise<number> {
   if (!result.isCached) {
     result.commit(result.data);
   }
-  return result.data.dist?.size || 0;
+  return result.data.dist.size ?? 0;
 }
 
 interface DatabasePackageDeprecated {
@@ -123,9 +123,18 @@ interface DatabasePackageDist {
   unpackedSize: number;
 }
 
+interface DatabasePackageDownloads {
+  lastDay: number;
+  lastWeek: number;
+  lastWeekVersion: number;
+  lastMonth: number;
+}
+
 interface DatabasePackageInfo {
   deprecated?: DatabasePackageDeprecated;
   dist: DatabasePackageDist;
+  tarballSize: number;
+  downloads: DatabasePackageDownloads;
 }
 
 async function getPackageIsDeprecated(name: string): Promise<boolean> {
@@ -186,11 +195,11 @@ async function getSortedDependents(
 
   const MAX_DEPENDENTS = 3000;
 
-  const processed = data.rows
+  const processed: ProcessedDependent[] = data.rows
     .map((r) => ({
       n: r.id,
-      v: r.value?.version?.trim() || "",
-      d: allStats[r.id] || 0,
+      v: r.value?.version?.trim() ?? "",
+      d: allStats[r.id] ?? 0,
     }))
     .sort((a, b) => b.d - a.d)
     .slice(0, MAX_DEPENDENTS);
