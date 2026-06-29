@@ -8,7 +8,7 @@
         "@astrojs/solid-js": "6.0.1",
         "@tailwindcss/vite": "4.3.1",
         "astro": "6.4.8",
-        "semver": "7.8.4",
+        "semver": "7.8.5",
         "solid-js": "1.9.13",
         "tailwindcss": "4.3.1",
       },
@@ -32,7 +32,7 @@
     "@jridgewell/trace-mapping": "0.3.31",
     "esbuild": "0.28.1",
     "is-docker": "4.0.0",
-    "semver": "7.8.4",
+    "semver": "7.8.5",
     "unstorage": "2.0.0-alpha.7",
   },
   "packages": {
@@ -776,7 +776,7 @@
 
     "sax": ["sax@1.6.0", "", {}, "sha512-6R3J5M4AcbtLUdZmRv2SygeVaM7IhrLXu9BmnOGmmACak8fiUtOsYNWUS4uK7upbmHIBbLBeFeI//477BKLBzA=="],
 
-    "semver": ["semver@7.8.4", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-rUCObTnP32Q08R2uuIrt7r9PlEonuTmtuXYcW6s5kjdlj3xbnwe+21yXptAUYcMAABLkYYTtnmzb3w3EDZfueA=="],
+    "semver": ["semver@7.8.5", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA=="],
 
     "seroval": ["seroval@1.5.4", "", {}, "sha512-46uFvgrXTVxZcUorgSSRZ4y+ieqLLQRMlG4bnCZKW3qI6BZm7Rg4ntMW4p1mILEEBZWrFlcpp0AyIIlM6jD9iw=="],
 
