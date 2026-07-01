@@ -33,9 +33,9 @@
     "unstorage": "2.0.0-alpha.7"
   },
   "dependencies": {
-    "@astrojs/solid-js": "6.0.1",
+    "@astrojs/solid-js": "7.0.0",
     "@tailwindcss/vite": "4.3.1",
-    "astro": "6.4.8",
+    "astro": "7.0.4",
     "semver": "7.8.4",
     "solid-js": "1.9.13",
     "tailwindcss": "4.3.1"
