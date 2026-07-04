@@ -37,7 +37,7 @@
     "@tailwindcss/vite": "4.3.2",
     "astro": "6.4.8",
     "semver": "7.8.4",
-    "solid-js": "1.9.13",
+    "solid-js": "1.9.14",
     "tailwindcss": "4.3.2"
   },
   "devDependencies": {
