@@ -109,7 +109,7 @@ export default function App() {
     try {
       const [pkgName, requestedRange] = getPackageNameAndVersion(pkg);
       const dev = isDev();
-      const limit = parseInt(limitInput(), 10) || 200;
+      const limit = Math.min(3000, Math.max(1, parseInt(limitInput(), 10) || 200));
 
       if (replaceState) {
         const url = new URL(window.location.href);
@@ -235,8 +235,14 @@ export default function App() {
               <input
                 type="number"
                 id="limitInput"
+                min="1"
+                max="3000"
+                step="50"
                 value={limitInput()}
-                onInput={(e) => setLimitInput(e.currentTarget.value)}
+                onInput={(e) => {
+                  const next = Math.min(3000, Math.max(1, parseInt(e.currentTarget.value, 10) || 1));
+                  setLimitInput(next.toString());
+                }}
                 onKeyPress={(e) => {
                   if (e.key === "Enter") startAnalysis();
                 }}
@@ -245,7 +251,7 @@ export default function App() {
               <div class="flex flex-col border border-slate-800 rounded-r-xl overflow-hidden bg-slate-900 shrink-0">
                 <button
                   type="button"
-                  tabIndex={-1}
+                  aria-label="Increase limit by 50"
                   onClick={() => {
                     const current = parseInt(limitInput(), 10) || 0;
                     setLimitInput(Math.min(3000, current + 50).toString());
@@ -258,7 +264,7 @@ export default function App() {
                 </button>
                 <button
                   type="button"
-                  tabIndex={-1}
+                  aria-label="Decrease limit by 50"
                   onClick={() => {
                     const current = parseInt(limitInput(), 10) || 0;
                     setLimitInput(Math.max(1, current - 50).toString());
