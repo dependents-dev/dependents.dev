@@ -203,11 +203,11 @@ export default function App() {
 
   return (
     <>
-      <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm mb-8 border border-slate-200 dark:border-slate-800">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+      <div class="bg-slate-900/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl mb-10 border border-slate-800/80">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-end">
           <div class="lg:col-span-2">
             <label
-              class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
+              class="block text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2"
               for="pkgInput"
             >
               Package Name (@version optional)
@@ -216,7 +216,7 @@ export default function App() {
               type="text"
               id="pkgInput"
               placeholder="e.g. lodash or @types/node@18"
-              class="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all dark:text-white"
+              class="w-full px-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:outline-none transition-all duration-200 shadow-inner"
               value={pkgInput()}
               onInput={(e) => setPkgInput(e.currentTarget.value)}
               onKeyPress={(e) => {
@@ -226,25 +226,55 @@ export default function App() {
           </div>
           <div>
             <label
-              class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1"
+              class="block text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2"
               for="limitInput"
             >
               Limit Results (max 3000)
             </label>
-            <input
-              type="number"
-              id="limitInput"
-              value={limitInput()}
-              onInput={(e) => setLimitInput(e.currentTarget.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") startAnalysis();
-              }}
-              class="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-white"
-            />
+            <div class="flex">
+              <input
+                type="number"
+                id="limitInput"
+                value={limitInput()}
+                onInput={(e) => setLimitInput(e.currentTarget.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") startAnalysis();
+                }}
+                class="w-full px-4 py-2.5 bg-slate-950/60 border border-r-0 border-slate-800 rounded-l-xl text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:outline-none transition-all duration-200 shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              />
+              <div class="flex flex-col border border-slate-800 rounded-r-xl overflow-hidden bg-slate-900 shrink-0">
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={() => {
+                    const current = parseInt(limitInput(), 10) || 0;
+                    setLimitInput(Math.min(3000, current + 50).toString());
+                  }}
+                  class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors border-b border-slate-800/80 cursor-pointer flex items-center justify-center"
+                >
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={() => {
+                    const current = parseInt(limitInput(), 10) || 0;
+                    setLimitInput(Math.max(1, current - 50).toString());
+                  }}
+                  class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                >
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
           <button
             id="searchBtn"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             type="button"
             onClick={() => startAnalysis()}
             disabled={loading()}
@@ -290,12 +320,12 @@ export default function App() {
           </button>
         </div>
 
-        <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <label class="flex items-center gap-2 cursor-pointer group">
+        <div class="mt-6 pt-5 border-t border-slate-800/80 flex items-center">
+          <label class="inline-flex items-center gap-3 cursor-pointer group select-none">
             <input
               type="checkbox"
               id="devCheckbox"
-              class="w-4 h-4 text-blue-600 rounded bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700"
+              class="sr-only peer"
               checked={isDev()}
               onChange={(e) => {
                 setIsDev(e.currentTarget.checked);
@@ -303,7 +333,24 @@ export default function App() {
                 if (pkgInput().trim()) startAnalysis();
               }}
             />
-            <span class="text-sm text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">
+            <div class="w-5 h-5 rounded-md bg-slate-950/80 border border-slate-700/80 peer-checked:bg-blue-600 peer-checked:border-blue-500 flex items-center justify-center transition-all duration-200 group-hover:border-slate-500 peer-checked:group-hover:border-blue-400 peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500/50 shadow-inner">
+              <Show when={isDev()}>
+                <svg
+                  class="w-3.5 h-3.5 text-white pointer-events-none"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="3"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </Show>
+            </div>
+            <span class="text-sm text-slate-400 group-hover:text-slate-200 transition-colors">
               Use devDependencies
             </span>
           </label>
@@ -311,20 +358,23 @@ export default function App() {
       </div>
 
       <Show when={!!error()}>
-        <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg">
-          {error()}
+        <div class="mb-8 p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl shadow-lg flex items-center gap-3">
+          <svg class="w-5 h-5 text-red-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="text-sm font-medium">{error()}</span>
         </div>
       </Show>
 
       <Show when={loading()}>
-        <div class="mb-6">
-          <div class="flex justify-between text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+        <div class="mb-8 px-2">
+          <div class="flex justify-between text-xs font-medium text-slate-400 mb-2">
             <span>{progressStatus()}</span>
             <span>{progressPercent()}%</span>
           </div>
-          <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5">
+          <div class="w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
             <div
-              class="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+              class="bg-blue-500 h-1.5 rounded-full transition-all duration-300 shadow-[0_0_12px_rgba(59,130,246,0.6)]"
               style={{ width: `${progressPercent()}%` }}
             />
           </div>
@@ -333,23 +383,23 @@ export default function App() {
 
       <Show when={state().status === "results"}>
         <div>
-          <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center gap-4">
-              <h2 class="text-xl font-bold text-slate-800 dark:text-white">
+          <div class="flex justify-between items-center mb-5 px-1">
+            <div class="flex items-baseline gap-3">
+              <h2 class="text-xl font-semibold text-white tracking-tight">
                 Results
               </h2>
-              <div class="text-sm text-slate-500 dark:text-slate-400">
-                Showing {resultsItems().length} packages
-              </div>
+              <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700/60">
+                {resultsItems().length} packages
+              </span>
             </div>
             <button
               id="copyMarkdownBtn"
-              class="text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-1.5 px-3 rounded border border-slate-300 dark:border-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+              class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white font-medium py-2 px-3.5 rounded-lg border border-slate-800 hover:border-slate-700 transition-all duration-150 flex items-center gap-2 cursor-pointer shadow-sm"
               type="button"
               onClick={copyAsMarkdown}
             >
               <svg
-                class="w-3.5 h-3.5"
+                class="w-3.5 h-3.5 text-slate-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -365,39 +415,39 @@ export default function App() {
               <span>{copyBtnLabel()}</span>
             </button>
           </div>
-          <div class="table-container bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <div class="table-container bg-slate-900/60 backdrop-blur-sm border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl">
             <table class="w-full text-left border-collapse">
-              <thead class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 uppercase text-xs font-bold">
-                <tr>
-                  <th class="px-6 py-3">#</th>
-                  <th class="px-6 py-3">Downloads/mo</th>
-                  <th class="px-6 py-3" classList={{ hidden: isDev() }}>
+              <thead class="bg-slate-950/50 border-b border-slate-800/80 text-slate-400 uppercase text-[11px] font-semibold tracking-wider">
+                <tr class="h-12">
+                  <th class="px-6 py-4 w-16 text-slate-500">#</th>
+                  <th class="px-6 py-4">Downloads/mo</th>
+                  <th class="px-6 py-4" classList={{ hidden: isDev() }}>
                     Traffic
                   </th>
-                  <th class="px-6 py-3" classList={{ hidden: isDev() }}>
+                  <th class="px-6 py-4" classList={{ hidden: isDev() }}>
                     Version Satisfied
                   </th>
-                  <th class="px-6 py-3">Package</th>
+                  <th class="px-6 py-4">Package</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+              <tbody class="divide-y divide-slate-800/50 text-sm">
                 <For each={resultsItems()}>
                   {(pkg, i) => (
-                    <tr class="hover:bg-slate-50 transition-colors">
-                      <td class="px-6 py-4 text-slate-400 font-medium">
+                    <tr class="hover:bg-slate-800/40 transition-colors duration-150 h-14">
+                      <td class="px-6 py-4 text-slate-500 font-mono text-xs">
                         {i() + 1}
                       </td>
-                      <td class="px-6 py-4 font-bold text-slate-700">
+                      <td class="px-6 py-4 font-semibold text-slate-200 font-mono text-xs">
                         {formatDownloads(pkg.downloads)}
                       </td>
                       <td
-                        class="px-6 py-4 font-mono text-slate-500"
+                        class="px-6 py-4 font-mono text-xs text-slate-400"
                         classList={{ hidden: isDev() }}
                       >
                         {formatTraffic(pkg.traffic)}
                       </td>
                       <td class="px-6 py-4" classList={{ hidden: isDev() }}>
-                        <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-mono font-medium bg-slate-800/80 text-blue-400 border border-slate-700/50">
                           {pkg.version || "any"}
                         </span>
                       </td>
@@ -406,7 +456,7 @@ export default function App() {
                           href={`https://npmx.dev/${pkg.name}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="text-blue-600 hover:underline font-medium"
+                          class="text-blue-400 hover:text-blue-300 hover:underline font-medium transition-colors"
                         >
                           {pkg.name}
                         </a>
@@ -421,9 +471,9 @@ export default function App() {
       </Show>
 
       <Show when={isInitial() || showEmpty()}>
-        <div class="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+        <div class="text-center py-20 bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-dashed border-slate-800">
           <svg
-            class="mx-auto h-12 w-12 text-slate-300 dark:text-slate-700"
+            class="mx-auto h-10 w-10 text-slate-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -432,11 +482,11 @@ export default function App() {
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
+              stroke-width="1.5"
               d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
             />
           </svg>
-          <p class="mt-4 text-slate-500 dark:text-slate-400 font-medium">
+          <p class="mt-3 text-sm text-slate-400 font-medium">
             {isInitial()
               ? "Enter a package name to start analysis."
               : `No${isDev() ? " dev" : ""} dependents were found for this package`}
