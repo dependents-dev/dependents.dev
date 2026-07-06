@@ -29,6 +29,7 @@
     "@babel/template": "7.29.7",
     "@babel/traverse": "7.29.7",
     "@babel/types": "7.29.7",
+    "@emnapi/runtime": "1.11.1",
     "@jridgewell/trace-mapping": "0.3.31",
     "esbuild": "0.28.1",
     "is-docker": "4.0.0",
