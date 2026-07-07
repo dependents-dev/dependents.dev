@@ -12,6 +12,7 @@
   "scripts": {
     "build": "astro build",
     "deploy": "wrangler deploy",
+    "deploy-preview": "wrangler versions upload",
     "dev": "astro dev",
     "format": "biome check --write --linter-enabled=false",
     "lint": "biome check",

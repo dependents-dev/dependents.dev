@@ -1,8 +1,6 @@
-name: CI
+name: Deploy Preview
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
@@ -10,7 +8,7 @@ permissions: {}
 
 jobs:
   test:
-    name: Test and Build
+    name: Deploy Preview
     runs-on: ubuntu-latest
 
     steps:
@@ -30,11 +28,7 @@ jobs:
       - name: Install dependencies
         run: bun ci
 
-      - name: Lint code
-        run: bun run lint
-
-      - name: Run tests
-        run: bun run test
-
-      - name: Build
-        run: bun run build
+      - name: Deploy Preview
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: bun run deploy-preview
