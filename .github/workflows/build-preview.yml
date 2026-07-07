@@ -1,0 +1,56 @@
+name: Build Preview
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun ci
+
+      - name: Build Preview
+        run: bun run build
+
+      - name: Upload build output
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: build-output
+          path: dist/
+
+      - name: Save PR metadata
+        run: |
+          mkdir -p pr-metadata
+          PR_NUM="${{ github.event.pull_request.number }}"
+          echo "$PR_NUM" > pr-metadata/pr_number
+
+          ALIAS="pr-$PR_NUM"
+          echo "$ALIAS" > pr-metadata/preview_alias
+
+          WORKER_NAME="dependents-dev"
+          SUBDOMAIN="gameroman"
+
+          echo "https://${ALIAS}-${WORKER_NAME}.${SUBDOMAIN}.workers.dev" > pr-metadata/preview_url
+
+      - name: Upload PR metadata
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pr-metadata
+          path: pr-metadata/
