@@ -259,6 +259,7 @@ export default function App() {
                   class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors border-b border-slate-800/80 cursor-pointer flex items-center justify-center"
                 >
                   <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <title>Increase limit</title>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
                   </svg>
                 </button>
@@ -272,6 +273,7 @@ export default function App() {
                   class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
                 >
                   <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <title>Decrease limit</title>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -348,6 +350,7 @@ export default function App() {
                   stroke="currentColor"
                   stroke-width="3"
                 >
+                  <title>Checkmark</title>
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
