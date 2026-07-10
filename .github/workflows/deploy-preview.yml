@@ -80,10 +80,10 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Deploy Preview
+        run: npx wrangler versions upload --preview-alias "$PREVIEW_ALIAS"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           PREVIEW_ALIAS: ${{ steps.metadata.outputs.preview_alias }}
-        run: bun run deploy-preview -- --preview-alias "$PREVIEW_ALIAS"
 
       - name: Comment deployment complete
         if: success()
