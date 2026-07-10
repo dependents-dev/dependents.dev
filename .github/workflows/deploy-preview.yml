@@ -78,6 +78,7 @@ jobs:
           name: build-output
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ github.token }}
+          path: .
 
       - name: Deploy Preview
         run: npx wrangler versions upload --preview-alias "$PREVIEW_ALIAS"
