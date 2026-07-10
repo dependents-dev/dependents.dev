@@ -109,7 +109,10 @@ export default function App() {
     try {
       const [pkgName, requestedRange] = getPackageNameAndVersion(pkg);
       const dev = isDev();
-      const limit = Math.min(3000, Math.max(1, parseInt(limitInput(), 10) || 200));
+      const limit = Math.min(
+        3000,
+        Math.max(1, parseInt(limitInput(), 10) || 200),
+      );
 
       if (replaceState) {
         const url = new URL(window.location.href);
@@ -240,7 +243,10 @@ export default function App() {
                 step="50"
                 value={limitInput()}
                 onInput={(e) => {
-                  const next = Math.min(3000, Math.max(1, parseInt(e.currentTarget.value, 10) || 1));
+                  const next = Math.min(
+                    3000,
+                    Math.max(1, parseInt(e.currentTarget.value, 10) || 1),
+                  );
                   setLimitInput(next.toString());
                 }}
                 onKeyPress={(e) => {
@@ -258,9 +264,19 @@ export default function App() {
                   }}
                   class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors border-b border-slate-800/80 cursor-pointer flex items-center justify-center"
                 >
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="w-3 h-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <title>Increase limit</title>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2.5"
+                      d="M5 15l7-7 7 7"
+                    />
                   </svg>
                 </button>
                 <button
@@ -272,9 +288,19 @@ export default function App() {
                   }}
                   class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
                 >
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    class="w-3 h-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <title>Decrease limit</title>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2.5"
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
               </div>
@@ -368,8 +394,18 @@ export default function App() {
 
       <Show when={!!error()}>
         <div class="mb-8 p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl shadow-lg flex items-center gap-3">
-          <svg class="w-5 h-5 text-red-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            class="w-5 h-5 text-red-400 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           <span class="text-sm font-medium">{error()}</span>
         </div>
