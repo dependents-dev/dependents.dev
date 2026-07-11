@@ -8,24 +8,30 @@ const description = `dependents.dev - Analyze package dependents, downloads, and
 ---
 
 <Layout {title} {description}>
-  <div class="max-w-6xl mx-auto p-4 md:p-8 relative">
-    <header class="mb-10 text-center">
-      <h1 class="text-4xl font-extrabold text-slate-800 dark:text-white mb-2">
-        dependents.dev
+  <div class="max-w-6xl mx-auto p-4 sm:p-6 md:p-12 relative">
+    <div
+      class="flex justify-end mb-4 sm:mb-0 sm:absolute sm:top-6 sm:right-6 md:top-12 md:right-12"
+    >
+      <a
+        href="/github"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="GitHub"
+        class="flex p-2 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all duration-200 shadow-sm"
+      >
+        <GithubIcon />
+      </a>
+    </div>
+    <header class="mb-12 text-center">
+      <h1
+        class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-3"
+      >
+        dependents<span class="text-blue-500 font-normal">.dev</span>
       </h1>
-      <p class="text-slate-600 dark:text-slate-400 italic">
+      <p class="text-slate-400 text-sm sm:text-base italic max-w-lg mx-auto">
         Analyze package dependents, downloads, and traffic across the ecosystem.
       </p>
     </header>
-    <a
-      href="/github"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="GitHub"
-      class="hidden sm:block sm:absolute sm:top-3 sm:right-3 md:top-5 md:right-5 p-1.5 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
-    >
-      <GithubIcon />
-    </a>
     <App client:load />
   </div>
 </Layout>
