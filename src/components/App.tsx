@@ -485,11 +485,11 @@ export default function App() {
                       <td class="px-6 py-4 text-slate-500 font-mono text-xs">
                         {i() + 1}
                       </td>
-                      <td class="px-6 py-4 font-semibold text-slate-200 font-mono text-xs">
+                      <td class="px-6 py-4 text-slate-300 font-medium">
                         {formatDownloads(pkg.downloads)}
                       </td>
                       <td
-                        class="px-6 py-4 font-mono text-xs text-slate-400"
+                        class="px-6 py-4 text-slate-300 font-medium"
                         classList={{ hidden: isDev() }}
                       >
                         {formatTraffic(pkg.traffic)}
