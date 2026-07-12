@@ -162,7 +162,9 @@ export default function App() {
         const chunk = items.slice(i, i + chunkSize);
         await Promise.all(
           chunk.map(async (item) => {
-            item.deprecated = await getPackageIsDeprecated(item.name).catch(() => false);
+            item.deprecated = await getPackageIsDeprecated(item.name).catch(
+              () => false,
+            );
           }),
         );
         onProgress(
