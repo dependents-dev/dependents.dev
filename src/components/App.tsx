@@ -1,7 +1,11 @@
 // @ts-expect-error semver has no types
 import semver from "semver";
 import { createSignal, For, onMount, Show } from "solid-js";
-import { getBasePackageSize, getSortedDependents } from "#lib/api";
+import {
+  getBasePackageSize,
+  getPackageIsDeprecated,
+  getSortedDependents,
+} from "#lib/api";
 import {
   escapeMdTable,
   formatDownloads,
@@ -14,6 +18,7 @@ interface AnalysisResult {
   version: string;
   downloads: number;
   traffic: number;
+  deprecated: boolean;
 }
 
 type State =
@@ -128,9 +133,9 @@ export default function App() {
         isDev: dev,
         onProgress,
       });
-      onProgress(99, "Calculating traffic and versions...");
+      onProgress(90, "Calculating traffic and versions...");
 
-      const items = sortedDeps
+      const items: AnalysisResult[] = sortedDeps
         .filter((d) => {
           if (!requestedRange) return true;
           if (d.v === requestedRange) return true;
@@ -141,13 +146,30 @@ export default function App() {
             return false;
           }
         })
+        .slice(0, limit)
         .map((d) => ({
           name: d.n,
           version: d.v,
           downloads: d.d,
           traffic: d.d * pkgSize,
-        }))
-        .slice(0, limit);
+          deprecated: false,
+        }));
+
+      onProgress(90, "Checking deprecation status...");
+
+      const chunkSize = 50;
+      for (let i = 0; i < items.length; i += chunkSize) {
+        const chunk = items.slice(i, i + chunkSize);
+        await Promise.all(
+          chunk.map(async (item) => {
+            item.deprecated = await getPackageIsDeprecated(item.name).catch(() => false);
+          }),
+        );
+        onProgress(
+          90 + Math.floor(((i + chunk.length) / items.length) * 9),
+          "Checking deprecation status...",
+        );
+      }
 
       setState(
         items.length > 0
@@ -181,7 +203,7 @@ export default function App() {
       const downloadsStr = formatDownloads(pkg.downloads);
       const trafficStr = formatTraffic(pkg.traffic);
       const versionStr = pkg.version || "any";
-      const pkgLink = `[${pkg.name}](https://npmx.dev/${pkg.name})`;
+      const pkgLink = `[${pkg.name}](https://npmx.dev/${pkg.name})${pkg.deprecated ? " ⚠️" : ""}`;
 
       if (!isDev()) {
         md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${trafficStr} | ${versionStr} | ${pkgLink} |\n`;
@@ -500,14 +522,32 @@ export default function App() {
                         </span>
                       </td>
                       <td class="px-6 py-4">
-                        <a
-                          href={`https://npmx.dev/${pkg.name}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="text-blue-400 hover:text-blue-300 hover:underline font-medium transition-colors"
-                        >
-                          {pkg.name}
-                        </a>
+                        <div class="flex items-center gap-1.5">
+                          <a
+                            href={`https://npmx.dev/${pkg.name}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-blue-400 hover:text-blue-300 hover:underline font-medium transition-colors"
+                          >
+                            {pkg.name}
+                          </a>
+                          <Show when={pkg.deprecated}>
+                            <svg
+                              class="w-4 h-4 text-amber-500"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <title>Deprecated</title>
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                              />
+                            </svg>
+                          </Show>
+                        </div>
                       </td>
                     </tr>
                   )}
