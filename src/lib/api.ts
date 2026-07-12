@@ -9,19 +9,12 @@ import {
 import { hash } from "./util";
 
 async function cachedFetch<T, P = T>(url: string, options: RequestInit = {}) {
-  const bodyString = options.body ? String(options.body) : "";
-  const hashKey = `fetch:${hash(url + bodyString)}`;
+  const hashKey = `fetch:${hash(url + (options.body || ""))}`;
   const cached = localStorage.getItem(hashKey);
 
   if (cached) {
     const { data, expiry }: { data: P; expiry: number } = JSON.parse(cached);
-    if (Date.now() < expiry) {
-      return {
-        data,
-        isCached: true as const,
-        commit: (_processedData: P, _ttlMinutes?: number) => {},
-      };
-    }
+    if (Date.now() < expiry) return { data, isCached: true as const };
     localStorage.removeItem(hashKey);
   }
 
@@ -153,22 +146,22 @@ async function getPackageIsDeprecated(name: string): Promise<boolean> {
   return result.data.deprecated?.deprecated ?? false;
 }
 
-interface DependentValueObject {
-  version?: string;
-  name?: string;
-  deprecated?: { deprecated?: boolean };
+interface DevDependentsRow {
+  id: string;
+  key: string;
+  value: string & { version: undefined };
 }
 
 interface DependentsRow {
   id: string;
   key: string;
-  value: string | DependentValueObject | null;
+  value: { name: string; version: string };
 }
 
 interface Dependents {
   total_rows: number;
   offset: number;
-  rows: DependentsRow[];
+  rows: DependentsRow[] | DevDependentsRow[];
 }
 
 interface ProcessedDependent {
@@ -203,23 +196,11 @@ async function getSortedDependents(
   const MAX_DEPENDENTS = 3000;
 
   const processed: ProcessedDependent[] = data.rows
-    .map((r) => {
-      let v = "";
-      if (typeof r.value === "string") {
-        v = r.value.trim();
-      } else if (
-        r.value !== null &&
-        typeof r.value === "object" &&
-        "version" in r.value
-      ) {
-        v = String(r.value.version).trim();
-      }
-      return {
-        n: r.id,
-        v,
-        d: allStats[r.id] ?? 0,
-      };
-    })
+    .map((r) => ({
+      n: r.id,
+      v: r.value?.version?.trim() ?? "",
+      d: allStats[r.id] ?? 0,
+    }))
     .sort((a, b) => b.d - a.d)
     .slice(0, MAX_DEPENDENTS);
 
