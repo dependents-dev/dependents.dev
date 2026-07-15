@@ -187,17 +187,26 @@ export default function App() {
     }
   }
 
+  function getPackageNote(pkg: AnalysisResult): string {
+    if (pkg.deprecated) return "Deprecated";
+    return "";
+  }
+
   async function copyAsMarkdown() {
     const currentState = state();
     if (currentState.status !== "results") return;
 
+    const hasNotes = currentState.items.some(
+      (pkg) => getPackageNote(pkg) !== "",
+    );
+
     let md = "";
     if (!isDev()) {
-      md += "| # | Downloads/month | Traffic | Version | Package |\n";
-      md += "|---|-----------------|---------|---------|---------|\n";
+      md += `| # | Downloads/month | Traffic | Version | Package |${hasNotes ? " Notes |" : ""}\n`;
+      md += `|---|-----------------|---------|---------|---------|${hasNotes ? "-------|" : ""}\n`;
     } else {
-      md += "| # | Downloads/month | Package |\n";
-      md += "|---|-----------------|---------|\n";
+      md += `| # | Downloads/month | Package |${hasNotes ? " Notes |" : ""}\n`;
+      md += `|---|-----------------|---------|${hasNotes ? "-------|" : ""}\n`;
     }
 
     currentState.items.forEach((pkg, i) => {
@@ -205,13 +214,18 @@ export default function App() {
       const downloadsStr = formatDownloads(pkg.downloads);
       const trafficStr = formatTraffic(pkg.traffic);
       const versionStr = pkg.version || "any";
-      const pkgLink = `[${pkg.name}](https://npmx.dev/${pkg.name})${pkg.deprecated ? " ⚠️" : ""}`;
+      const pkgLink = `[${pkg.name}](https://npmx.dev/${pkg.name})`;
+      const noteStr = getPackageNote(pkg);
 
       if (!isDev()) {
-        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${trafficStr} | ${versionStr} | ${pkgLink} |\n`;
+        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${trafficStr} | ${versionStr} | ${pkgLink} |`;
       } else {
-        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${pkgLink} |\n`;
+        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${pkgLink} |`;
       }
+      if (hasNotes) {
+        md += escapeMdTable` ${noteStr} |`;
+      }
+      md += "\n";
     });
 
     try {
