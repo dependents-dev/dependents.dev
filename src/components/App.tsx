@@ -235,6 +235,17 @@ export default function App() {
               Limit Results (max 3000)
             </label>
             <div class="flex">
+              <button
+                type="button"
+                aria-label="Decrease limit by 50"
+                onClick={() => {
+                  const current = parseInt(limitInput(), 10) || 0;
+                  setLimitInput(Math.max(1, current - 50).toString());
+                }}
+                class="px-4 text-lg font-medium bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center rounded-l-xl border border-r-0 border-slate-800"
+              >
+                −
+              </button>
               <input
                 type="number"
                 id="limitInput"
@@ -252,58 +263,19 @@ export default function App() {
                 onKeyPress={(e) => {
                   if (e.key === "Enter") startAnalysis();
                 }}
-                class="w-full px-4 py-2.5 bg-slate-950/60 border border-r-0 border-slate-800 rounded-l-xl text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:outline-none transition-all duration-200 shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                class="w-full px-4 py-2.5 text-center bg-slate-950/60 border border-l-0 border-r-0 border-slate-800 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:outline-none transition-all duration-200 shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
-              <div class="flex flex-col border border-slate-800 rounded-r-xl overflow-hidden bg-slate-900 shrink-0">
-                <button
-                  type="button"
-                  aria-label="Increase limit by 50"
-                  onClick={() => {
-                    const current = parseInt(limitInput(), 10) || 0;
-                    setLimitInput(Math.min(3000, current + 50).toString());
-                  }}
-                  class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors border-b border-slate-800/80 cursor-pointer flex items-center justify-center"
-                >
-                  <svg
-                    class="w-3 h-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>Increase limit</title>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2.5"
-                      d="M5 15l7-7 7 7"
-                    />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  aria-label="Decrease limit by 50"
-                  onClick={() => {
-                    const current = parseInt(limitInput(), 10) || 0;
-                    setLimitInput(Math.max(1, current - 50).toString());
-                  }}
-                  class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
-                >
-                  <svg
-                    class="w-3 h-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>Decrease limit</title>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2.5"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-              </div>
+              <button
+                type="button"
+                aria-label="Increase limit by 50"
+                onClick={() => {
+                  const current = parseInt(limitInput(), 10) || 0;
+                  setLimitInput(Math.min(3000, current + 50).toString());
+                }}
+                class="px-4 text-lg font-medium bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center rounded-r-xl border border-l-0 border-slate-800"
+              >
+                +
+              </button>
             </div>
           </div>
           <button

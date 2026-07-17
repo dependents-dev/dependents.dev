@@ -13,8 +13,9 @@
     "build": "astro build",
     "deploy": "wrangler deploy",
     "dev": "astro dev",
-    "format": "biome check --write --linter-enabled=false",
+    "format": "biome check --write",
     "lint": "biome check",
+    "preview": "astro preview",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
