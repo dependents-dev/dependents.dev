@@ -36,6 +36,7 @@ export default function App() {
   const [error, setError] = createSignal("");
   const [state, setState] = createSignal<State>({ status: "initial" });
   const [copyBtnLabel, setCopyBtnLabel] = createSignal("Copy as Markdown");
+  let activeAnalysisId = 0;
 
   const isInitial = () => state().status === "initial";
   const showEmpty = () =>
@@ -106,6 +107,7 @@ export default function App() {
     const pkg = pkgInput().trim();
     if (!pkg) return;
 
+    const currentAnalysisId = ++activeAnalysisId;
     setLoading(true);
     setError("");
     setState({ status: "no-results" });
@@ -159,6 +161,7 @@ export default function App() {
 
       const chunkSize = 50;
       for (let i = 0; i < items.length; i += chunkSize) {
+        if (currentAnalysisId !== activeAnalysisId) return;
         const chunk = items.slice(i, i + chunkSize);
         await Promise.all(
           chunk.map(async (item) => {
@@ -167,12 +170,14 @@ export default function App() {
             );
           }),
         );
+        if (currentAnalysisId !== activeAnalysisId) return;
         onProgress(
           90 + Math.floor(((i + chunk.length) / items.length) * 9),
           "Checking deprecation status...",
         );
       }
 
+      if (currentAnalysisId !== activeAnalysisId) return;
       setState(
         items.length > 0
           ? { status: "results", items }
@@ -180,10 +185,13 @@ export default function App() {
       );
       onProgress(100, "Analysis complete");
     } catch (err) {
+      if (currentAnalysisId !== activeAnalysisId) return;
       console.error(err);
       setError((err as Error).message);
     } finally {
-      setLoading(false);
+      if (currentAnalysisId === activeAnalysisId) {
+        setLoading(false);
+      }
     }
   }
 
