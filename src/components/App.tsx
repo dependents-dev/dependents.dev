@@ -454,7 +454,7 @@ export default function App() {
                 <For each={resultsItems()}>
                   {(pkg, i) => (
                     <tr class="hover:bg-slate-800/40 transition-colors duration-150 h-14">
-                      <td class="px-6 py-4 text-slate-500 font-mono text-xs">
+                      <td class="px-6 py-4 text-slate-400 font-mono text-xs">
                         {i() + 1}
                       </td>
                       <td class="px-6 py-4 text-slate-300 font-medium">
