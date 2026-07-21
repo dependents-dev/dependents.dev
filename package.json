@@ -45,7 +45,7 @@
     "@biomejs/biome": "2.5.4",
     "@gameroman/config": "0.2.5",
     "@types/bun": "1.3.14",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "wrangler": "4.110.0"
   }
 }
