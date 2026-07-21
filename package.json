@@ -35,11 +35,11 @@
   },
   "dependencies": {
     "@astrojs/solid-js": "7.0.1",
-    "@tailwindcss/vite": "4.3.2",
+    "@tailwindcss/vite": "4.3.3",
     "astro": "7.0.7",
     "semver": "7.8.5",
     "solid-js": "1.9.14",
-    "tailwindcss": "4.3.2"
+    "tailwindcss": "4.3.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.4",
