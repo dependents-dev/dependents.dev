@@ -205,7 +205,7 @@ export default function App() {
   });
 
   return (
-    <>
+    <main>
       <div class="bg-slate-900/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl mb-10 border border-slate-800/80">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-end">
           <div class="lg:col-span-2">
@@ -435,7 +435,7 @@ export default function App() {
               <span>{copyBtnLabel()}</span>
             </button>
           </div>
-          <div class="table-container bg-slate-900/60 backdrop-blur-sm border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl">
+          <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead class="bg-slate-950/50 border-b border-slate-800/80 text-slate-400 uppercase text-[11px] font-semibold tracking-wider">
                 <tr class="h-12">
@@ -513,6 +513,6 @@ export default function App() {
           </p>
         </div>
       </Show>
-    </>
+    </main>
   );
 }

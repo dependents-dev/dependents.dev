@@ -4,8 +4,7 @@ import { defineConfig } from "astro/config";
 
 export default defineConfig({
   output: "static",
-  build: { format: "preserve" },
   integrations: [solid()],
-  vite: { plugins: [tailwindcss()] },
+  vite: { plugins: [tailwindcss()], build: { cssTarget: "safari15" } },
   site: "https://dependents.dev",
 });
