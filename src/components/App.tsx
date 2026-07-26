@@ -435,7 +435,7 @@ export default function App() {
               <span>{copyBtnLabel()}</span>
             </button>
           </div>
-          <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl shadow- overflow-x-auto">
+          <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead class="bg-slate-950/50 border-b border-slate-800/80 text-slate-400 uppercase text-[11px] font-semibold tracking-wider">
                 <tr class="h-12">
