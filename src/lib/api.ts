@@ -138,7 +138,7 @@ interface DatabasePackageInfo {
 }
 
 async function getPackageIsDeprecated(name: string): Promise<boolean> {
-  const url = `${LIVE_REGISTRY_URL}/${name}` as const;
+  const url = `${LIVE_REGISTRY_URL}/${encodeURIComponent(name)}` as const;
   const result = await cachedFetch<DatabasePackageInfo>(url);
   if (!result.isCached) {
     result.commit(result.data);

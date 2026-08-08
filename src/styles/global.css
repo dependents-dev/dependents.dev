@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
-.table-container {
-  overflow-x: auto;
-  border-radius: 1rem;
-  box-shadow:
-    0 10px 25px -5px rgb(0 0 0 / 0.3),
-    0 8px 10px -6px rgb(0 0 0 / 0.3);
+@theme {
+  --background-image-night: radial-gradient(
+    125% 125% at 50% 10%,
+    #000 40%,
+    #1e3a8a 100%
+  );
 }

@@ -1,6 +1,5 @@
-// @ts-expect-error semver has no types
-import semver from "semver";
 import { createSignal, For, onMount, Show } from "solid-js";
+import { rangesIntersect } from "verkit";
 import {
   getBasePackageSize,
   getPackageIsDeprecated,
@@ -143,7 +142,7 @@ export default function App() {
           if (d.v === requestedRange) return true;
           if (d.v === "*" || requestedRange === "*") return true;
           try {
-            return semver.intersects(d.v, requestedRange);
+            return rangesIntersect(d.v, requestedRange);
           } catch {
             return false;
           }
@@ -251,7 +250,7 @@ export default function App() {
   });
 
   return (
-    <>
+    <main>
       <div class="bg-slate-900/80 backdrop-blur-md p-6 sm:p-8 rounded-2xl shadow-xl mb-10 border border-slate-800/80">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-end">
           <div class="lg:col-span-2">
@@ -281,6 +280,17 @@ export default function App() {
               Limit Results (max 3000)
             </label>
             <div class="flex">
+              <button
+                type="button"
+                aria-label="Decrease limit by 50"
+                onClick={() => {
+                  const current = parseInt(limitInput(), 10) || 0;
+                  setLimitInput(Math.max(1, current - 50).toString());
+                }}
+                class="px-4 text-lg font-medium bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center rounded-l-xl border border-r-0 border-slate-800"
+              >
+                −
+              </button>
               <input
                 type="number"
                 id="limitInput"
@@ -298,58 +308,19 @@ export default function App() {
                 onKeyPress={(e) => {
                   if (e.key === "Enter") startAnalysis();
                 }}
-                class="w-full px-4 py-2.5 bg-slate-950/60 border border-r-0 border-slate-800 rounded-l-xl text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:outline-none transition-all duration-200 shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                class="w-full px-4 py-2.5 text-center bg-slate-950/60 border border-l-0 border-r-0 border-slate-800 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:outline-none transition-all duration-200 shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
-              <div class="flex flex-col border border-slate-800 rounded-r-xl overflow-hidden bg-slate-900 shrink-0">
-                <button
-                  type="button"
-                  aria-label="Increase limit by 50"
-                  onClick={() => {
-                    const current = parseInt(limitInput(), 10) || 0;
-                    setLimitInput(Math.min(3000, current + 50).toString());
-                  }}
-                  class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors border-b border-slate-800/80 cursor-pointer flex items-center justify-center"
-                >
-                  <svg
-                    class="w-3 h-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>Increase limit</title>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2.5"
-                      d="M5 15l7-7 7 7"
-                    />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  aria-label="Decrease limit by 50"
-                  onClick={() => {
-                    const current = parseInt(limitInput(), 10) || 0;
-                    setLimitInput(Math.max(1, current - 50).toString());
-                  }}
-                  class="flex-1 px-3 bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
-                >
-                  <svg
-                    class="w-3 h-3"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <title>Decrease limit</title>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2.5"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-              </div>
+              <button
+                type="button"
+                aria-label="Increase limit by 50"
+                onClick={() => {
+                  const current = parseInt(limitInput(), 10) || 0;
+                  setLimitInput(Math.min(3000, current + 50).toString());
+                }}
+                class="px-4 text-lg font-medium bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center rounded-r-xl border border-l-0 border-slate-800"
+              >
+                +
+              </button>
             </div>
           </div>
           <button
@@ -509,7 +480,7 @@ export default function App() {
               <span>{copyBtnLabel()}</span>
             </button>
           </div>
-          <div class="table-container bg-slate-900/60 backdrop-blur-sm border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl">
+          <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-800/80 rounded-2xl overflow-hidden shadow-xl overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead class="bg-slate-950/50 border-b border-slate-800/80 text-slate-400 uppercase text-[11px] font-semibold tracking-wider">
                 <tr class="h-12">
@@ -528,7 +499,7 @@ export default function App() {
                 <For each={resultsItems()}>
                   {(pkg, i) => (
                     <tr class="hover:bg-slate-800/40 transition-colors duration-150 h-14">
-                      <td class="px-6 py-4 text-slate-500 font-mono text-xs">
+                      <td class="px-6 py-4 text-slate-400 font-mono text-xs">
                         {i() + 1}
                       </td>
                       <td class="px-6 py-4 text-slate-300 font-medium">
@@ -607,6 +578,6 @@ export default function App() {
           </p>
         </div>
       </Show>
-    </>
+    </main>
   );
 }
