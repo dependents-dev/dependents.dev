@@ -1,6 +1,5 @@
-// @ts-expect-error semver has no types
-import semver from "semver";
 import { createSignal, For, onMount, Show } from "solid-js";
+import { rangesIntersect } from "verkit";
 import { getBasePackageSize, getSortedDependents } from "#lib/api";
 import {
   escapeMdTable,
@@ -136,7 +135,7 @@ export default function App() {
           if (d.v === requestedRange) return true;
           if (d.v === "*" || requestedRange === "*") return true;
           try {
-            return semver.intersects(d.v, requestedRange);
+            return rangesIntersect(d.v, requestedRange);
           } catch {
             return false;
           }
