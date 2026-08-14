@@ -4,7 +4,6 @@ import {
   MIN_BATCH_SIZE,
   MIN_PACKAGES_FOR_BATCH_MODE,
   NPM_REGISTRY_BASE_URL,
-  REGISTRY_URL,
 } from "./constants";
 import { hash } from "./util";
 
@@ -59,7 +58,7 @@ async function fetchAllStats(
   onProgress: (percent: number, status: string) => void,
 ) {
   const combinedStats: Record<string, number> = {};
-  const url = `${REGISTRY_URL}/_design/downloads/_view/downloads` as const;
+  const url = `${LIVE_REGISTRY_URL}/_design/downloads/_view/downloads` as const;
 
   if (names.length <= MIN_PACKAGES_FOR_BATCH_MODE) {
     onProgress(40, `Fetching stats for ${names.length} packages...`);
