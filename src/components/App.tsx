@@ -1,6 +1,10 @@
 import { createSignal, For, onMount, Show } from "solid-js";
 import { rangesIntersect } from "verkit";
-import { getBasePackageSize, getSortedDependents } from "#lib/api";
+import {
+  getBasePackageSize,
+  getPackageIsDeprecated,
+  getSortedDependents,
+} from "#lib/api";
 import {
   escapeMdTable,
   formatDownloads,
@@ -13,6 +17,7 @@ interface AnalysisResult {
   version: string;
   downloads: number;
   traffic: number;
+  deprecated: boolean;
 }
 
 type State =
@@ -30,6 +35,7 @@ export default function App() {
   const [error, setError] = createSignal("");
   const [state, setState] = createSignal<State>({ status: "initial" });
   const [copyBtnLabel, setCopyBtnLabel] = createSignal("Copy as Markdown");
+  let activeAnalysisId = 0;
 
   const isInitial = () => state().status === "initial";
   const showEmpty = () =>
@@ -100,6 +106,7 @@ export default function App() {
     const pkg = pkgInput().trim();
     if (!pkg) return;
 
+    const currentAnalysisId = ++activeAnalysisId;
     setLoading(true);
     setError("");
     setState({ status: "no-results" });
@@ -127,9 +134,9 @@ export default function App() {
         isDev: dev,
         onProgress,
       });
-      onProgress(99, "Calculating traffic and versions...");
+      onProgress(90, "Calculating traffic and versions...");
 
-      const items = sortedDeps
+      const items: AnalysisResult[] = sortedDeps
         .filter((d) => {
           if (!requestedRange) return true;
           if (d.v === requestedRange) return true;
@@ -140,14 +147,36 @@ export default function App() {
             return false;
           }
         })
+        .slice(0, limit)
         .map((d) => ({
           name: d.n,
           version: d.v,
           downloads: d.d,
           traffic: d.d * pkgSize,
-        }))
-        .slice(0, limit);
+          deprecated: false,
+        }));
 
+      onProgress(90, "Checking deprecation status...");
+
+      const chunkSize = 50;
+      for (let i = 0; i < items.length; i += chunkSize) {
+        if (currentAnalysisId !== activeAnalysisId) return;
+        const chunk = items.slice(i, i + chunkSize);
+        await Promise.all(
+          chunk.map(async (item) => {
+            item.deprecated = await getPackageIsDeprecated(item.name).catch(
+              () => false,
+            );
+          }),
+        );
+        if (currentAnalysisId !== activeAnalysisId) return;
+        onProgress(
+          90 + Math.floor(((i + chunk.length) / items.length) * 9),
+          "Checking deprecation status...",
+        );
+      }
+
+      if (currentAnalysisId !== activeAnalysisId) return;
       setState(
         items.length > 0
           ? { status: "results", items }
@@ -155,24 +184,36 @@ export default function App() {
       );
       onProgress(100, "Analysis complete");
     } catch (err) {
+      if (currentAnalysisId !== activeAnalysisId) return;
       console.error(err);
       setError((err as Error).message);
     } finally {
-      setLoading(false);
+      if (currentAnalysisId === activeAnalysisId) {
+        setLoading(false);
+      }
     }
+  }
+
+  function getPackageNote(pkg: AnalysisResult): string {
+    if (pkg.deprecated) return "Deprecated";
+    return "";
   }
 
   async function copyAsMarkdown() {
     const currentState = state();
     if (currentState.status !== "results") return;
 
+    const hasNotes = currentState.items.some(
+      (pkg) => getPackageNote(pkg) !== "",
+    );
+
     let md = "";
     if (!isDev()) {
-      md += "| # | Downloads/month | Traffic | Version | Package |\n";
-      md += "|---|-----------------|---------|---------|---------|\n";
+      md += `| # | Downloads/month | Traffic | Version | Package |${hasNotes ? " Notes |" : ""}\n`;
+      md += `|---|-----------------|---------|---------|---------|${hasNotes ? "-------|" : ""}\n`;
     } else {
-      md += "| # | Downloads/month | Package |\n";
-      md += "|---|-----------------|---------|\n";
+      md += `| # | Downloads/month | Package |${hasNotes ? " Notes |" : ""}\n`;
+      md += `|---|-----------------|---------|${hasNotes ? "-------|" : ""}\n`;
     }
 
     currentState.items.forEach((pkg, i) => {
@@ -181,12 +222,17 @@ export default function App() {
       const trafficStr = formatTraffic(pkg.traffic);
       const versionStr = pkg.version || "any";
       const pkgLink = `[${pkg.name}](https://npmx.dev/${pkg.name})`;
+      const noteStr = getPackageNote(pkg);
 
       if (!isDev()) {
-        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${trafficStr} | ${versionStr} | ${pkgLink} |\n`;
+        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${trafficStr} | ${versionStr} | ${pkgLink} |`;
       } else {
-        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${pkgLink} |\n`;
+        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${pkgLink} |`;
       }
+      if (hasNotes) {
+        md += escapeMdTable` ${noteStr} |`;
+      }
+      md += "\n";
     });
 
     try {
@@ -471,14 +517,34 @@ export default function App() {
                         </span>
                       </td>
                       <td class="px-6 py-4">
-                        <a
-                          href={`https://npmx.dev/${pkg.name}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="text-blue-400 hover:text-blue-300 hover:underline font-medium transition-colors"
-                        >
-                          {pkg.name}
-                        </a>
+                        <div class="flex items-center gap-1.5">
+                          <a
+                            href={`https://npmx.dev/${pkg.name}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-blue-400 hover:text-blue-300 hover:underline font-medium transition-colors"
+                          >
+                            {pkg.name}
+                          </a>
+                          <Show when={pkg.deprecated}>
+                            <svg
+                              class="w-4 h-4 text-amber-500"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              role="img"
+                              aria-label="Deprecated"
+                            >
+                              <title>Deprecated</title>
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                              />
+                            </svg>
+                          </Show>
+                        </div>
                       </td>
                     </tr>
                   )}
