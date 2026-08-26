@@ -29,7 +29,6 @@
     "@babel/types": "7.29.8",
     "@jridgewell/trace-mapping": "0.3.31",
     "esbuild": "0.28.2",
-    "find-process": "npm:find-proc@0.1.0",
     "js-yaml": "npm:neoyaml@0.1.1",
     "sax": "npm:es-sax@0.1.2",
     "semver": "7.8.5",
@@ -38,7 +37,7 @@
   "dependencies": {
     "@astrojs/solid-js": "7.0.2",
     "@tailwindcss/vite": "4.3.3",
-    "astro": "7.2.4",
+    "astro": "7.2.8",
     "solid-js": "1.9.15",
     "tailwindcss": "4.3.3",
     "verkit": "0.4.0"
@@ -48,6 +47,6 @@
     "@gameroman/config": "0.2.9",
     "@types/bun": "1.4.0",
     "typescript": "7.0.2",
-    "wrangler": "4.125.0"
+    "wrangler": "4.126.0"
   }
 }
