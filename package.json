@@ -47,6 +47,6 @@
     "@gameroman/config": "0.2.9",
     "@types/bun": "1.4.0",
     "typescript": "7.0.2",
-    "wrangler": "4.126.0"
+    "wrangler": "4.127.0"
   }
 }
