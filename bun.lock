@@ -31,7 +31,7 @@
     "@babel/types": "7.29.8",
     "@jridgewell/trace-mapping": "0.3.31",
     "esbuild": "0.28.2",
-    "js-yaml": "npm:neoyaml@0.1.2",
+    "js-yaml": "npm:neoyaml@0.2.0",
     "sax": "npm:es-sax@0.1.2",
     "semver": "7.8.5",
     "unstorage": "2.0.0-alpha.9",
@@ -593,7 +593,7 @@
 
     "js-tokens": ["js-tokens@4.0.0", "", {}, "sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ=="],
 
-    "js-yaml": ["neoyaml@0.1.2", "", {}, "sha512-5nvOb4w9Co74IxHfUaP18nF/oKweA4BJCTjiT6iNzcQp2s0ILb7SYf6eUFVeRvJsKgTwulPdtqaAzNh7I5+pzQ=="],
+    "js-yaml": ["neoyaml@0.2.0", "", {}, "sha512-OhyH8IjUmsAUwcFCkvM/qNDpEGuNj+tpg5BX3V8qdWrF0zIlbQaB5oH+aXjxkzaa8cpZoNm0q4iNMLD6zOlk4Q=="],
 
     "jsesc": ["jsesc@3.1.0", "", { "bin": { "jsesc": "bin/jsesc" } }, "sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA=="],
 

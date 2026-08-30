@@ -29,7 +29,7 @@
     "@babel/types": "7.29.8",
     "@jridgewell/trace-mapping": "0.3.31",
     "esbuild": "0.28.2",
-    "js-yaml": "npm:neoyaml@0.1.2",
+    "js-yaml": "npm:neoyaml@0.2.0",
     "sax": "npm:es-sax@0.1.2",
     "semver": "7.8.5",
     "unstorage": "2.0.0-alpha.9"
