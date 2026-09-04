@@ -1,0 +1,20 @@
+function CubeIcon() {
+  return (
+    <svg
+      class="mx-auto size-10 text-slate-600"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.5"
+        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+      />
+    </svg>
+  );
+}
+
+export default CubeIcon;

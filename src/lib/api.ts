@@ -78,7 +78,7 @@ async function fetchAllStats(
     const totalBatches = Math.ceil(names.length / batchSize);
 
     for (let i = 0; i < totalBatches; i++) {
-      const pct = Math.round(40 + (i / totalBatches) * 58);
+      const pct = Math.round(40 + (i / totalBatches) * 50);
       onProgress(pct, `Fetching stats for ${names.length} packages...`);
       const batch = names.slice(i * batchSize, (i + 1) * batchSize);
       const { data } = await cachedFetch<DownloadsStats>(url, {
@@ -92,7 +92,7 @@ async function fetchAllStats(
     }
   }
 
-  onProgress(98, "Stats fetch complete.");
+  onProgress(90, "Stats fetch complete.");
   return combinedStats;
 }
 
