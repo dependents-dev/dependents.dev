@@ -53,6 +53,7 @@ export default function App() {
     const s = state();
     return s.status === "results" ? s.items : [];
   };
+  const hasDeprecated = () => resultsItems().some((pkg) => pkg.deprecated);
 
   const onProgress = (percent: number, status: string) => {
     setProgressPercent(percent);
@@ -418,6 +419,12 @@ export default function App() {
                     Version Satisfied
                   </th>
                   <th class="px-6 py-4">Package</th>
+                  <th
+                    class="px-6 py-4"
+                    classList={{ hidden: !hasDeprecated() }}
+                  >
+                    Notes
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-800/50 text-sm">
@@ -451,10 +458,15 @@ export default function App() {
                           >
                             {pkg.name}
                           </a>
-                          <Show when={pkg.deprecated}>
-                            <WarningIcon />
-                          </Show>
                         </div>
+                      </td>
+                      <td
+                        class="px-6 py-4"
+                        classList={{ hidden: !hasDeprecated() }}
+                      >
+                        <Show when={pkg.deprecated}>
+                          <WarningIcon />
+                        </Show>
                       </td>
                     </tr>
                   )}
