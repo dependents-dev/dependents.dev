@@ -14,11 +14,6 @@ function formatDownloads(downloads: number) {
   return downloads.toString();
 }
 
-const reg = /[|`\\_]/g;
-function escapeMdTable(str: TemplateStringsArray, ...values: string[]) {
-  return String.raw({ raw: str }, ...values.map((v) => v.replace(reg, "\\$&")));
-}
-
 const hash = (str: string) => {
   let h = 5381;
   let i = str.length;
@@ -40,10 +35,4 @@ function getPackageNameAndVersion(input: string): PackageNameAndVersion {
   return [packageName, version];
 }
 
-export {
-  escapeMdTable,
-  formatDownloads,
-  formatTraffic,
-  getPackageNameAndVersion,
-  hash,
-};
+export { formatDownloads, formatTraffic, getPackageNameAndVersion, hash };

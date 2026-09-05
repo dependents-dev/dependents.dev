@@ -207,6 +207,7 @@ async function getSortedDependents(
   return processed;
 }
 
+export type { ProcessedDependent };
 export {
   cachedFetch,
   fetchAllStats,

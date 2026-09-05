@@ -1,5 +1,4 @@
 import { createSignal, For, onMount, Show } from "solid-js";
-import { rangesIntersect } from "verkit";
 
 import {
   getBasePackageSize,
@@ -7,8 +6,10 @@ import {
   getSortedDependents,
 } from "#lib/api";
 import { DEFAULT_MAX_DEPENDENTS, MAX_DEPENDENTS } from "#lib/constants";
+import { buildResultsMarkdownTable, getPackageNote } from "#lib/markdown";
+import type { AnalysisResult } from "#lib/results";
+import { buildAnalysisResults } from "#lib/results";
 import {
-  escapeMdTable,
   formatDownloads,
   formatTraffic,
   getPackageNameAndVersion,
@@ -21,14 +22,6 @@ import ErrorIcon from "./icon/Error";
 import LoadingIcon from "./icon/Loading";
 import SearchIcon from "./icon/Search";
 import WarningIcon from "./icon/Warning";
-
-interface AnalysisResult {
-  name: string;
-  version: string;
-  downloads: number;
-  traffic: number;
-  deprecated: boolean;
-}
 
 type State =
   | { status: "initial" }
@@ -141,25 +134,11 @@ export default function App() {
       });
       onProgress(91, "Calculating traffic and versions...");
 
-      const items: AnalysisResult[] = sortedDeps
-        .filter((d) => {
-          if (!requestedRange) return true;
-          if (d.v === requestedRange) return true;
-          if (d.v === "*" || requestedRange === "*") return true;
-          try {
-            return rangesIntersect(d.v, requestedRange);
-          } catch {
-            return false;
-          }
-        })
-        .slice(0, limit)
-        .map((d) => ({
-          name: d.n,
-          version: d.v,
-          downloads: d.d,
-          traffic: d.d * pkgSize,
-          deprecated: false,
-        }));
+      const items: AnalysisResult[] = buildAnalysisResults(sortedDeps, {
+        requestedRange,
+        limit,
+        pkgSize,
+      });
 
       onProgress(92, "Checking deprecation status...");
 
@@ -199,43 +178,11 @@ export default function App() {
     }
   }
 
-  function getPackageNote(pkg: AnalysisResult): string {
-    if (pkg.deprecated) return "Deprecated";
-    return "";
-  }
-
   async function copyAsMarkdown() {
     const currentState = state();
     if (currentState.status !== "results") return;
 
-    let md = "";
-    const showNotes = hasNotes();
-    if (!isDev()) {
-      md += `| # | Downloads/month | Traffic | Version | Package |${showNotes ? " Notes |" : ""}\n`;
-      md += `|---|-----------------|---------|---------|---------|${showNotes ? "-------|" : ""}\n`;
-    } else {
-      md += `| # | Downloads/month | Package |${showNotes ? " Notes |" : ""}\n`;
-      md += `|---|-----------------|---------|${showNotes ? "-------|" : ""}\n`;
-    }
-
-    currentState.items.forEach((pkg, i) => {
-      const indexStr = `${i + 1}`;
-      const downloadsStr = formatDownloads(pkg.downloads);
-      const trafficStr = formatTraffic(pkg.traffic);
-      const versionStr = pkg.version || "any";
-      const pkgLink = `[${pkg.name}](https://npmx.dev/${pkg.name})`;
-      const noteStr = getPackageNote(pkg);
-
-      if (!isDev()) {
-        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${trafficStr} | ${versionStr} | ${pkgLink} |`;
-      } else {
-        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${pkgLink} |`;
-      }
-      if (showNotes) {
-        md += escapeMdTable` ${noteStr} |`;
-      }
-      md += "\n";
-    });
+    const md = buildResultsMarkdownTable(currentState.items, isDev());
 
     try {
       await navigator.clipboard.writeText(md);
