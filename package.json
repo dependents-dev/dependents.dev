@@ -34,7 +34,7 @@
     "sax": "npm:es-sax@0.1.2",
     "semver": "7.8.5",
     "sharp": "0.35.4",
-    "unstorage": "2.0.0-alpha.9"
+    "unstorage": "2.0.0-alpha.10"
   },
   "dependencies": {
     "@astrojs/solid-js": "7.0.2",
