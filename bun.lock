@@ -36,7 +36,7 @@
     "sax": "npm:es-sax@0.1.2",
     "semver": "7.8.5",
     "sharp": "0.35.4",
-    "unstorage": "2.0.0-alpha.9",
+    "unstorage": "2.0.0-alpha.10",
   },
   "packages": {
     "@astrojs/compiler-binding": ["@astrojs/compiler-binding@0.4.0", "", { "optionalDependencies": { "@astrojs/compiler-binding-darwin-arm64": "0.4.0", "@astrojs/compiler-binding-darwin-x64": "0.4.0", "@astrojs/compiler-binding-linux-arm64-gnu": "0.4.0", "@astrojs/compiler-binding-linux-arm64-musl": "0.4.0", "@astrojs/compiler-binding-linux-x64-gnu": "0.4.0", "@astrojs/compiler-binding-linux-x64-musl": "0.4.0", "@astrojs/compiler-binding-wasm32-wasi": "0.4.0", "@astrojs/compiler-binding-win32-arm64-msvc": "0.4.0", "@astrojs/compiler-binding-win32-x64-msvc": "0.4.0" } }, "sha512-x2RjDUuWfwLNtc3mjAdSRInwqh/rqbLar9cm/5FOMbHvmYZB7yfKewzSclAxWjIZsypJDXv1lhaP2WG+P8TK3g=="],
@@ -789,7 +789,7 @@
 
     "unist-util-visit-parents": ["unist-util-visit-parents@6.0.2", "", { "dependencies": { "@types/unist": "^3.0.0", "unist-util-is": "^6.0.0" } }, "sha512-goh1s1TBrqSqukSc8wrjwWhL0hiJxgA8m4kFxGlQ+8FYQ3C/m11FcTs4YYem7V664AhHVvgoQLk890Ssdsr2IQ=="],
 
-    "unstorage": ["unstorage@2.0.0-alpha.9", "", {}, "sha512-zUVLVO5Vci1vu1aTYkopEUgKhnemAvH3qv7PuNIxFtA8jGaCTVp+AbRwrVyldo81WIK7EU/bXB/cJWVJtJ7//A=="],
+    "unstorage": ["unstorage@2.0.0-alpha.10", "", {}, "sha512-6h1veZp8gnp4dGllf0tDijoXxDYymJu251IpKKkrSVH+QHL6tXFbwG85KM+CBHSgpkkgtPuIiZ9oLCLP5+1Evw=="],
 
     "update-browserslist-db": ["update-browserslist-db@1.2.3", "", { "dependencies": { "escalade": "^3.2.0", "picocolors": "^1.1.1" }, "peerDependencies": { "browserslist": ">= 4.21.0" }, "bin": { "update-browserslist-db": "cli.js" } }, "sha512-Js0m9cx+qOgDxo0eMiFGEueWztz+d4+M3rGlmKPT+T4IS/jP4ylw3Nwpu6cpTTP8R1MAC1kF4VbdLt3ARf209w=="],
 
