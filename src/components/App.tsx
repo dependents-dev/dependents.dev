@@ -56,7 +56,7 @@ export default function App() {
     const s = state();
     return s.status === "results" ? s.items : [];
   };
-  const hasDeprecated = () => resultsItems().some((pkg) => pkg.deprecated);
+  const hasNotes = () => resultsItems().some((pkg) => getPackageNote(pkg));
 
   const onProgress = (percent: number, status: string) => {
     setProgressPercent(percent);
@@ -208,17 +208,14 @@ export default function App() {
     const currentState = state();
     if (currentState.status !== "results") return;
 
-    const hasNotes = currentState.items.some(
-      (pkg) => getPackageNote(pkg) !== "",
-    );
-
     let md = "";
+    const showNotes = hasNotes();
     if (!isDev()) {
-      md += `| # | Downloads/month | Traffic | Version | Package |${hasNotes ? " Notes |" : ""}\n`;
-      md += `|---|-----------------|---------|---------|---------|${hasNotes ? "-------|" : ""}\n`;
+      md += `| # | Downloads/month | Traffic | Version | Package |${showNotes ? " Notes |" : ""}\n`;
+      md += `|---|-----------------|---------|---------|---------|${showNotes ? "-------|" : ""}\n`;
     } else {
-      md += `| # | Downloads/month | Package |${hasNotes ? " Notes |" : ""}\n`;
-      md += `|---|-----------------|---------|${hasNotes ? "-------|" : ""}\n`;
+      md += `| # | Downloads/month | Package |${showNotes ? " Notes |" : ""}\n`;
+      md += `|---|-----------------|---------|${showNotes ? "-------|" : ""}\n`;
     }
 
     currentState.items.forEach((pkg, i) => {
@@ -234,7 +231,7 @@ export default function App() {
       } else {
         md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${pkgLink} |`;
       }
-      if (hasNotes) {
+      if (showNotes) {
         md += escapeMdTable` ${noteStr} |`;
       }
       md += "\n";
@@ -424,10 +421,7 @@ export default function App() {
                     Version Satisfied
                   </th>
                   <th class="px-6 py-4">Package</th>
-                  <th
-                    class="px-6 py-4"
-                    classList={{ hidden: !hasDeprecated() }}
-                  >
+                  <th class="px-6 py-4" classList={{ hidden: !hasNotes() }}>
                     Notes
                   </th>
                 </tr>
@@ -465,10 +459,7 @@ export default function App() {
                           </a>
                         </div>
                       </td>
-                      <td
-                        class="px-6 py-4"
-                        classList={{ hidden: !hasDeprecated() }}
-                      >
+                      <td class="px-6 py-4" classList={{ hidden: !hasNotes() }}>
                         <Show when={pkg.deprecated}>
                           <WarningIcon />
                         </Show>
