@@ -6,6 +6,7 @@ import {
   getPackageIsDeprecated,
   getSortedDependents,
 } from "#lib/api";
+import { DEFAULT_MAX_DEPENDENTS, MAX_DEPENDENTS } from "#lib/constants";
 import {
   escapeMdTable,
   formatDownloads,
@@ -36,7 +37,9 @@ type State =
 
 export default function App() {
   const [pkgInput, setPkgInput] = createSignal("");
-  const [limitInput, setLimitInput] = createSignal("200");
+  const [limitInput, setLimitInput] = createSignal(
+    DEFAULT_MAX_DEPENDENTS.toString(),
+  );
   const [isDev, setIsDev] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
   const [progressPercent, setProgressPercent] = createSignal(0);
@@ -74,7 +77,7 @@ export default function App() {
     } else if (isDev) {
       url.searchParams.set("dev", "true");
     }
-    if (limit === "" || limit === "200") {
+    if (limit === "" || limit === DEFAULT_MAX_DEPENDENTS.toString()) {
       url.searchParams.delete("limit");
     } else if (limit) {
       url.searchParams.set("limit", limit);
@@ -118,8 +121,8 @@ export default function App() {
       const [pkgName, requestedRange] = getPackageNameAndVersion(pkg);
       const dev = isDev();
       const limit = Math.min(
-        3000,
-        Math.max(1, parseInt(limitInput(), 10) || 200),
+        MAX_DEPENDENTS,
+        Math.max(1, parseInt(limitInput(), 10) || DEFAULT_MAX_DEPENDENTS),
       );
 
       if (replaceState) {
@@ -279,7 +282,7 @@ export default function App() {
               class="block text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2"
               for="limitInput"
             >
-              Limit Results (max 3000)
+              {`Limit Results (max ${MAX_DEPENDENTS})`}
             </label>
             <div class="flex">
               <button
@@ -297,12 +300,12 @@ export default function App() {
                 type="number"
                 id="limitInput"
                 min="1"
-                max="3000"
+                max={MAX_DEPENDENTS.toString()}
                 step="50"
                 value={limitInput()}
                 onInput={(e) => {
                   const next = Math.min(
-                    3000,
+                    MAX_DEPENDENTS,
                     Math.max(1, parseInt(e.currentTarget.value, 10) || 1),
                   );
                   setLimitInput(next.toString());
@@ -317,7 +320,9 @@ export default function App() {
                 aria-label="Increase limit by 50"
                 onClick={() => {
                   const current = parseInt(limitInput(), 10) || 0;
-                  setLimitInput(Math.min(3000, current + 50).toString());
+                  setLimitInput(
+                    Math.min(MAX_DEPENDENTS, current + 50).toString(),
+                  );
                 }}
                 class="px-4 text-lg font-medium bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center rounded-r-xl border border-l-0 border-slate-800"
               >

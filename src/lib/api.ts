@@ -1,9 +1,10 @@
 import {
-  LIVE_REGISTRY_URL,
   MAX_BATCHES,
+  MAX_DEPENDENTS,
   MIN_BATCH_SIZE,
   MIN_PACKAGES_FOR_BATCH_MODE,
   NPM_REGISTRY_BASE_URL,
+  REGISTRY_URL,
 } from "./constants";
 import { hash } from "./util";
 
@@ -58,7 +59,7 @@ async function fetchAllStats(
   onProgress: (percent: number, status: string) => void,
 ) {
   const combinedStats: Record<string, number> = {};
-  const url = `${LIVE_REGISTRY_URL}/_design/downloads/_view/downloads` as const;
+  const url = `${REGISTRY_URL}/_design/downloads/_view/downloads` as const;
 
   if (names.length <= MIN_PACKAGES_FOR_BATCH_MODE) {
     onProgress(40, `Fetching stats for ${names.length} packages...`);
@@ -137,7 +138,7 @@ interface DatabasePackageInfo {
 }
 
 async function getPackageIsDeprecated(name: string): Promise<boolean> {
-  const url = `${LIVE_REGISTRY_URL}/${encodeURIComponent(name)}` as const;
+  const url = `${REGISTRY_URL}/${encodeURIComponent(name)}` as const;
   const result = await cachedFetch<DatabasePackageInfo>(url);
   if (!result.isCached) {
     result.commit(result.data);
@@ -178,7 +179,7 @@ async function getSortedDependents(
 ): Promise<ProcessedDependent[]> {
   const view = options.isDev ? "dev-dependencies" : "dependents2";
   const url =
-    `${LIVE_REGISTRY_URL}/_design/dependents/_view/${view}?key="${packageName}"` as const;
+    `${REGISTRY_URL}/_design/dependents/_view/${view}?key="${packageName}"` as const;
 
   const { data, isCached, commit } = await cachedFetch<
     Dependents,
@@ -191,8 +192,6 @@ async function getSortedDependents(
 
   const allNames = data.rows.map((r) => r.id);
   const allStats = await fetchAllStats(allNames, options.onProgress);
-
-  const MAX_DEPENDENTS = 3000;
 
   const processed: ProcessedDependent[] = data.rows
     .map((r) => ({
