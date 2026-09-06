@@ -2,7 +2,7 @@ import { createSignal, For, onMount, Show } from "solid-js";
 
 import {
   getBasePackageSize,
-  getPackageIsDeprecated,
+  getDeprecatedPackages,
   getSortedDependents,
 } from "#lib/api";
 import { DEFAULT_MAX_DEPENDENTS, MAX_DEPENDENTS } from "#lib/constants";
@@ -132,7 +132,7 @@ export default function App() {
         isDev: dev,
         onProgress,
       });
-      onProgress(91, "Calculating traffic and versions...");
+      onProgress(98, "Calculating traffic and versions...");
 
       const items: AnalysisResult[] = buildAnalysisResults(sortedDeps, {
         requestedRange,
@@ -140,25 +140,14 @@ export default function App() {
         pkgSize,
       });
 
-      onProgress(92, "Checking deprecation status...");
+      onProgress(99, "Checking deprecation status...");
 
-      const chunkSize = 50;
-      for (let i = 0; i < items.length; i += chunkSize) {
-        if (currentAnalysisId !== activeAnalysisId) return;
-        const chunk = items.slice(i, i + chunkSize);
-        await Promise.all(
-          chunk.map(async (item) => {
-            item.deprecated = await getPackageIsDeprecated(item.name).catch(
-              () => false,
-            );
-          }),
-        );
-        if (currentAnalysisId !== activeAnalysisId) return;
-        onProgress(
-          92 + Math.floor(((i + chunk.length) / items.length) * 7),
-          "Checking deprecation status...",
-        );
-      }
+      const deprecated = await getDeprecatedPackages(
+        items.map((item) => item.name),
+      ).catch(() => new Set<string>());
+      items.forEach((item) => {
+        item.deprecated = deprecated.has(item.name);
+      });
 
       if (currentAnalysisId !== activeAnalysisId) return;
       setState(

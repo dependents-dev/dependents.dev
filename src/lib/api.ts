@@ -79,7 +79,7 @@ async function fetchAllStats(
     const totalBatches = Math.ceil(names.length / batchSize);
 
     for (let i = 0; i < totalBatches; i++) {
-      const pct = Math.round(40 + (i / totalBatches) * 50);
+      const pct = Math.round(40 + (i / totalBatches) * 58);
       onProgress(pct, `Fetching stats for ${names.length} packages...`);
       const batch = names.slice(i * batchSize, (i + 1) * batchSize);
       const { data } = await cachedFetch<DownloadsStats>(url, {
@@ -93,7 +93,6 @@ async function fetchAllStats(
     }
   }
 
-  onProgress(90, "Stats fetch complete.");
   return combinedStats;
 }
 
@@ -115,35 +114,28 @@ async function getBasePackageSize(name: string): Promise<number> {
   return result.data.dist.size ?? 0;
 }
 
-interface DatabasePackageDeprecated {
-  deprecated: boolean;
+interface DeprecatedRow {
+  key: string;
+  value: number;
 }
 
-interface DatabasePackageDist {
-  unpackedSize: number;
+interface DeprecatedViewResponse {
+  rows: DeprecatedRow[];
 }
 
-interface DatabasePackageDownloads {
-  lastDay: number;
-  lastWeek: number;
-  lastWeekVersion: number;
-  lastMonth: number;
-}
-
-interface DatabasePackageInfo {
-  deprecated?: DatabasePackageDeprecated;
-  dist: DatabasePackageDist;
-  tarballSize: number;
-  downloads: DatabasePackageDownloads;
-}
-
-async function getPackageIsDeprecated(name: string): Promise<boolean> {
-  const url = `${REGISTRY_URL}/${encodeURIComponent(name)}` as const;
-  const result = await cachedFetch<DatabasePackageInfo>(url);
-  if (!result.isCached) {
-    result.commit(result.data);
-  }
-  return result.data.deprecated?.deprecated ?? false;
+async function getDeprecatedPackages(names: string[]): Promise<Set<string>> {
+  const url =
+    `${REGISTRY_URL}/_design/deprecated/_view/deprecated?keys=${encodeURIComponent(
+      JSON.stringify(names),
+    )}&group=true` as const;
+  const { data, isCached, commit } = await cachedFetch<
+    DeprecatedViewResponse,
+    string[]
+  >(url);
+  if (isCached) return new Set(data);
+  const deprecatedNames = data.rows.map((r) => r.key);
+  commit(deprecatedNames);
+  return new Set(deprecatedNames);
 }
 
 interface DevDependentsRow {
@@ -210,8 +202,7 @@ async function getSortedDependents(
 export type { ProcessedDependent };
 export {
   cachedFetch,
-  fetchAllStats,
   getBasePackageSize,
-  getPackageIsDeprecated,
+  getDeprecatedPackages,
   getSortedDependents,
 };
