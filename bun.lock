@@ -15,7 +15,7 @@
       "devDependencies": {
         "@biomejs/biome": "2.5.12",
         "@gameroman/config": "0.2.9",
-        "@types/bun": "1.4.0",
+        "@types/bun": "1.4.1",
         "typescript": "7.0.2",
         "wrangler": "4.129.0",
       },
@@ -393,7 +393,7 @@
 
     "@types/babel__traverse": ["@types/babel__traverse@7.28.0", "", { "dependencies": { "@babel/types": "^7.28.2" } }, "sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q=="],
 
-    "@types/bun": ["@types/bun@1.4.0", "", { "dependencies": { "bun-types": "1.4.0" } }, "sha512-K+lZULY23vRgK/CfTjFIV+tyifaNdSMlPh9j+6mQ/cLfpOznLyAuzgV/JQysyECpkBQLVMSyvjlr2fBUSA9wFQ=="],
+    "@types/bun": ["@types/bun@1.4.1", "", { "dependencies": { "bun-types": "1.4.1" } }, "sha512-0AVGiTXGajf1rgKom3N+c5L7CBxuoyyv1i44M0nX4UDK0G/fnRAMiri93nHuVPIb429KKtAgj7HatVmmOjeQLA=="],
 
     "@types/estree": ["@types/estree@1.0.9", "", {}, "sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg=="],
 
@@ -473,7 +473,7 @@
 
     "browserslist": ["browserslist@4.28.2", "", { "dependencies": { "baseline-browser-mapping": "^2.10.12", "caniuse-lite": "^1.0.30001782", "electron-to-chromium": "^1.5.328", "node-releases": "^2.0.36", "update-browserslist-db": "^1.2.3" }, "bin": { "browserslist": "cli.js" } }, "sha512-48xSriZYYg+8qXna9kwqjIVzuQxi+KYWp2+5nCYnYKPTr0LvD89Jqk2Or5ogxz0NUMfIjhh2lIUX/LyX9B4oIg=="],
 
-    "bun-types": ["bun-types@1.4.0", "", { "dependencies": { "@types/node": "*" } }, "sha512-iIKw23BspnQQYd3prITOBxeUsxBHnwzX6YJfGMuNOZzeNcMmVqzIIVGRm1l69ogaPQmb4wB6BN8mA5bE9YuC5Q=="],
+    "bun-types": ["bun-types@1.4.1", "", { "dependencies": { "@types/node": "*" } }, "sha512-loKuVrAFZKfEv+JvWkHRS9GW5IqLuLRjVXN9p+vZvBN86O5hf/pBZQ5hSoyipsrMmWObZBDvWnlmKvjKTM0PdA=="],
 
     "caniuse-lite": ["caniuse-lite@1.0.30001799", "", {}, "sha512-hG1bReV+OUU+MOqK4t/ZWI0tZOyz3rqS9XuhOUz1cIcbwBKjOyJEJuw9ER5JuNyqxNk8u/JUVbGibBOL1yrjFw=="],
 
