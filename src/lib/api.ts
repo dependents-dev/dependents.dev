@@ -125,13 +125,15 @@ interface DeprecatedViewResponse {
 
 async function getDeprecatedPackages(names: string[]): Promise<Set<string>> {
   const url =
-    `${REGISTRY_URL}/_design/deprecated/_view/deprecated?keys=${encodeURIComponent(
-      JSON.stringify(names),
-    )}&group=true` as const;
+    `${REGISTRY_URL}/_design/deprecated/_view/deprecated?group=true` as const;
   const { data, isCached, commit } = await cachedFetch<
     DeprecatedViewResponse,
     string[]
-  >(url);
+  >(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ keys: names }),
+  });
   if (isCached) return new Set(data);
   const deprecatedNames = data.rows.map((r) => r.key);
   commit(deprecatedNames);
