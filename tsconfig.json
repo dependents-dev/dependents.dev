@@ -3,7 +3,9 @@
   "compilerOptions": {
     "jsxImportSource": "solid-js",
     "jsx": "preserve",
-    "types": ["bun"]
+    "types": ["bun"],
+
+    "exactOptionalPropertyTypes": false
   },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]

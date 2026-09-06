@@ -1,19 +1,27 @@
 import { createSignal, For, onMount, Show } from "solid-js";
-import { rangesIntersect } from "verkit";
-import { getBasePackageSize, getSortedDependents } from "#lib/api";
+
 import {
-  escapeMdTable,
+  getBasePackageSize,
+  getDeprecatedPackages,
+  getSortedDependents,
+} from "#lib/api";
+import { DEFAULT_MAX_DEPENDENTS, MAX_DEPENDENTS } from "#lib/constants";
+import { buildResultsMarkdownTable, getPackageNote } from "#lib/markdown";
+import type { AnalysisResult } from "#lib/results";
+import { buildAnalysisResults } from "#lib/results";
+import {
   formatDownloads,
   formatTraffic,
   getPackageNameAndVersion,
 } from "#lib/util";
 
-interface AnalysisResult {
-  name: string;
-  version: string;
-  downloads: number;
-  traffic: number;
-}
+import CheckmarkIcon from "./icon/Checkmark";
+import CopyIcon from "./icon/Copy";
+import CubeIcon from "./icon/Cube";
+import ErrorIcon from "./icon/Error";
+import LoadingIcon from "./icon/Loading";
+import SearchIcon from "./icon/Search";
+import WarningIcon from "./icon/Warning";
 
 type State =
   | { status: "initial" }
@@ -22,7 +30,9 @@ type State =
 
 export default function App() {
   const [pkgInput, setPkgInput] = createSignal("");
-  const [limitInput, setLimitInput] = createSignal("200");
+  const [limitInput, setLimitInput] = createSignal(
+    DEFAULT_MAX_DEPENDENTS.toString(),
+  );
   const [isDev, setIsDev] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
   const [progressPercent, setProgressPercent] = createSignal(0);
@@ -30,6 +40,7 @@ export default function App() {
   const [error, setError] = createSignal("");
   const [state, setState] = createSignal<State>({ status: "initial" });
   const [copyBtnLabel, setCopyBtnLabel] = createSignal("Copy as Markdown");
+  let activeAnalysisId = 0;
 
   const isInitial = () => state().status === "initial";
   const showEmpty = () =>
@@ -38,6 +49,7 @@ export default function App() {
     const s = state();
     return s.status === "results" ? s.items : [];
   };
+  const hasNotes = () => resultsItems().some((pkg) => getPackageNote(pkg));
 
   const onProgress = (percent: number, status: string) => {
     setProgressPercent(percent);
@@ -46,15 +58,7 @@ export default function App() {
 
   function setUrlParams(
     url: URL,
-    {
-      pkg,
-      isDev,
-      limit,
-    }: {
-      pkg?: string;
-      isDev?: boolean;
-      limit?: string;
-    },
+    { pkg, isDev, limit }: { pkg?: string; isDev?: boolean; limit?: string },
   ) {
     if (pkg === "") {
       url.searchParams.delete("package");
@@ -66,7 +70,7 @@ export default function App() {
     } else if (isDev) {
       url.searchParams.set("dev", "true");
     }
-    if (limit === "" || limit === "200") {
+    if (limit === "" || limit === DEFAULT_MAX_DEPENDENTS.toString()) {
       url.searchParams.delete("limit");
     } else if (limit) {
       url.searchParams.set("limit", limit);
@@ -100,6 +104,7 @@ export default function App() {
     const pkg = pkgInput().trim();
     if (!pkg) return;
 
+    const currentAnalysisId = ++activeAnalysisId;
     setLoading(true);
     setError("");
     setState({ status: "no-results" });
@@ -109,8 +114,8 @@ export default function App() {
       const [pkgName, requestedRange] = getPackageNameAndVersion(pkg);
       const dev = isDev();
       const limit = Math.min(
-        3000,
-        Math.max(1, parseInt(limitInput(), 10) || 200),
+        MAX_DEPENDENTS,
+        Math.max(1, parseInt(limitInput(), 10) || DEFAULT_MAX_DEPENDENTS),
       );
 
       if (replaceState) {
@@ -127,27 +132,24 @@ export default function App() {
         isDev: dev,
         onProgress,
       });
-      onProgress(99, "Calculating traffic and versions...");
+      onProgress(98, "Calculating traffic and versions...");
 
-      const items = sortedDeps
-        .filter((d) => {
-          if (!requestedRange) return true;
-          if (d.v === requestedRange) return true;
-          if (d.v === "*" || requestedRange === "*") return true;
-          try {
-            return rangesIntersect(d.v, requestedRange);
-          } catch {
-            return false;
-          }
-        })
-        .map((d) => ({
-          name: d.n,
-          version: d.v,
-          downloads: d.d,
-          traffic: d.d * pkgSize,
-        }))
-        .slice(0, limit);
+      const items: AnalysisResult[] = buildAnalysisResults(sortedDeps, {
+        requestedRange,
+        limit,
+        pkgSize,
+      });
 
+      onProgress(99, "Checking deprecation status...");
+
+      const deprecated = await getDeprecatedPackages(
+        items.map((item) => item.name),
+      ).catch(() => new Set<string>());
+      items.forEach((item) => {
+        item.deprecated = deprecated.has(item.name);
+      });
+
+      if (currentAnalysisId !== activeAnalysisId) return;
       setState(
         items.length > 0
           ? { status: "results", items }
@@ -156,9 +158,12 @@ export default function App() {
       onProgress(100, "Analysis complete");
     } catch (err) {
       console.error(err);
+      if (currentAnalysisId !== activeAnalysisId) return;
       setError((err as Error).message);
     } finally {
-      setLoading(false);
+      if (currentAnalysisId === activeAnalysisId) {
+        setLoading(false);
+      }
     }
   }
 
@@ -166,28 +171,7 @@ export default function App() {
     const currentState = state();
     if (currentState.status !== "results") return;
 
-    let md = "";
-    if (!isDev()) {
-      md += "| # | Downloads/month | Traffic | Version | Package |\n";
-      md += "|---|-----------------|---------|---------|---------|\n";
-    } else {
-      md += "| # | Downloads/month | Package |\n";
-      md += "|---|-----------------|---------|\n";
-    }
-
-    currentState.items.forEach((pkg, i) => {
-      const indexStr = `${i + 1}`;
-      const downloadsStr = formatDownloads(pkg.downloads);
-      const trafficStr = formatTraffic(pkg.traffic);
-      const versionStr = pkg.version || "any";
-      const pkgLink = `[${pkg.name}](https://npmx.dev/${pkg.name})`;
-
-      if (!isDev()) {
-        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${trafficStr} | ${versionStr} | ${pkgLink} |\n`;
-      } else {
-        md += escapeMdTable`| ${indexStr} | ${downloadsStr} | ${pkgLink} |\n`;
-      }
-    });
+    const md = buildResultsMarkdownTable(currentState.items, isDev());
 
     try {
       await navigator.clipboard.writeText(md);
@@ -231,7 +215,7 @@ export default function App() {
               class="block text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2"
               for="limitInput"
             >
-              Limit Results (max 3000)
+              {`Limit Results (max ${MAX_DEPENDENTS})`}
             </label>
             <div class="flex">
               <button
@@ -249,12 +233,12 @@ export default function App() {
                 type="number"
                 id="limitInput"
                 min="1"
-                max="3000"
+                max={MAX_DEPENDENTS.toString()}
                 step="50"
                 value={limitInput()}
                 onInput={(e) => {
                   const next = Math.min(
-                    3000,
+                    MAX_DEPENDENTS,
                     Math.max(1, parseInt(e.currentTarget.value, 10) || 1),
                   );
                   setLimitInput(next.toString());
@@ -269,7 +253,9 @@ export default function App() {
                 aria-label="Increase limit by 50"
                 onClick={() => {
                   const current = parseInt(limitInput(), 10) || 0;
-                  setLimitInput(Math.min(3000, current + 50).toString());
+                  setLimitInput(
+                    Math.min(MAX_DEPENDENTS, current + 50).toString(),
+                  );
                 }}
                 class="px-4 text-lg font-medium bg-slate-900 hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center rounded-r-xl border border-l-0 border-slate-800"
               >
@@ -285,43 +271,8 @@ export default function App() {
             disabled={loading()}
           >
             <span>Analyze</span>
-            <svg
-              id="searchIcon"
-              class="w-4 h-4"
-              classList={{ hidden: loading() }}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <svg
-              id="loadingIcon"
-              class="animate-spin h-4 w-4 text-white"
-              classList={{ hidden: !loading() }}
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              />
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
+            <SearchIcon hidden={loading()} />
+            <LoadingIcon hidden={!loading()} />
           </button>
         </div>
 
@@ -338,22 +289,9 @@ export default function App() {
                 if (pkgInput().trim()) startAnalysis();
               }}
             />
-            <div class="w-5 h-5 rounded-md bg-slate-950/80 border border-slate-700/80 peer-checked:bg-blue-600 peer-checked:border-blue-500 flex items-center justify-center transition-all duration-200 group-hover:border-slate-500 peer-checked:group-hover:border-blue-400 peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500/50 shadow-inner">
+            <div class="size-5 rounded-md bg-slate-950/80 border border-slate-700/80 peer-checked:bg-blue-600 peer-checked:border-blue-500 flex items-center justify-center transition-all duration-200 group-hover:border-slate-500 peer-checked:group-hover:border-blue-400 peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500/50 shadow-inner">
               <Show when={isDev()}>
-                <svg
-                  class="w-3.5 h-3.5 text-white pointer-events-none"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="3"
-                >
-                  <title>Checkmark</title>
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+                <CheckmarkIcon />
               </Show>
             </div>
             <span class="text-sm text-slate-400 group-hover:text-slate-200 transition-colors">
@@ -365,22 +303,7 @@ export default function App() {
 
       <Show when={!!error()}>
         <div class="mb-8 p-4 bg-red-950/40 border border-red-800/60 text-red-300 rounded-xl shadow-lg flex items-center gap-3">
-          <svg
-            class="w-5 h-5 text-red-400 shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            role="img"
-            aria-label="Error"
-          >
-            <title>Error</title>
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+          <ErrorIcon />
           <span class="text-sm font-medium">{error()}</span>
         </div>
       </Show>
@@ -417,20 +340,7 @@ export default function App() {
               type="button"
               onClick={copyAsMarkdown}
             >
-              <svg
-                class="w-3.5 h-3.5 text-slate-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-                />
-              </svg>
+              <CopyIcon />
               <span>{copyBtnLabel()}</span>
             </button>
           </div>
@@ -447,6 +357,9 @@ export default function App() {
                     Version Satisfied
                   </th>
                   <th class="px-6 py-4">Package</th>
+                  <th class="px-6 py-4" classList={{ hidden: !hasNotes() }}>
+                    Notes
+                  </th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-800/50 text-sm">
@@ -471,14 +384,21 @@ export default function App() {
                         </span>
                       </td>
                       <td class="px-6 py-4">
-                        <a
-                          href={`https://npmx.dev/${pkg.name}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="text-blue-400 hover:text-blue-300 hover:underline font-medium transition-colors"
-                        >
-                          {pkg.name}
-                        </a>
+                        <div class="flex items-center gap-1.5">
+                          <a
+                            href={`https://npmx.dev/${pkg.name}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-blue-400 hover:text-blue-300 hover:underline font-medium transition-colors"
+                          >
+                            {pkg.name}
+                          </a>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4" classList={{ hidden: !hasNotes() }}>
+                        <Show when={pkg.deprecated}>
+                          <WarningIcon />
+                        </Show>
                       </td>
                     </tr>
                   )}
@@ -491,20 +411,7 @@ export default function App() {
 
       <Show when={isInitial() || showEmpty()}>
         <div class="text-center py-20 bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-dashed border-slate-800">
-          <svg
-            class="mx-auto h-10 w-10 text-slate-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-            />
-          </svg>
+          <CubeIcon />
           <p class="mt-3 text-sm text-slate-400 font-medium">
             {isInitial()
               ? "Enter a package name to start analysis."
