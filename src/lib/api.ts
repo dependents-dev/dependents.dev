@@ -202,9 +202,4 @@ async function getSortedDependents(
 }
 
 export type { ProcessedDependent };
-export {
-  cachedFetch,
-  getBasePackageSize,
-  getDeprecatedPackages,
-  getSortedDependents,
-};
+export { getBasePackageSize, getDeprecatedPackages, getSortedDependents };
