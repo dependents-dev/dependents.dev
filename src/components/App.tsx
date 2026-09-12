@@ -246,7 +246,7 @@ export default function App() {
                 onKeyPress={(e) => {
                   if (e.key === "Enter") startAnalysis();
                 }}
-                class="w-full px-4 py-2.5 text-center bg-slate-950/60 border border-l-0 border-r-0 border-slate-800 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:outline-none transition-all duration-200 shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                class="w-full px-4 py-2.5 text-center bg-slate-950/60 border border-x-0 border-slate-800 text-slate-100 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 focus:outline-none transition-all duration-200 shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <button
                 type="button"
