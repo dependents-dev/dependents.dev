@@ -34,7 +34,7 @@
     "js-yaml": "npm:neoyaml@0.2.0",
     "sax": "npm:es-sax@0.1.2",
     "semver": "7.8.5",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "unstorage": "2.0.0-alpha.10"
   },
   "dependencies": {
