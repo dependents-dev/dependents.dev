@@ -1,48 +1,14 @@
 import { describe, expect, it } from "bun:test";
-import { getPackageNameAndVersion } from "#lib/util";
+import { formatDownloads, formatTraffic } from "#lib/util";
 
-describe("getPackageNameAndVersion", () => {
-  it("should handle non-scoped packages", () => {
-    expect(getPackageNameAndVersion("astro")).toEqual(["astro"]);
-    expect(getPackageNameAndVersion(" astro ")).toEqual(["astro"]);
+describe("formatDownloads", () => {
+  it("handles millions", () => {
+    expect(formatDownloads(7_520_000)).toEqual("7.52M");
   });
+});
 
-  it("should handle scoped packages", () => {
-    expect(getPackageNameAndVersion("@clack/prompts")).toEqual([
-      "@clack/prompts",
-    ]);
-    expect(getPackageNameAndVersion(" @clack/prompts ")).toEqual([
-      "@clack/prompts",
-    ]);
-  });
-
-  it("should handle non-scoped packages with version", () => {
-    expect(getPackageNameAndVersion("vite@7")).toEqual(["vite", "7"]);
-    expect(getPackageNameAndVersion(" vite@7 ")).toEqual(["vite", "7"]);
-    expect(getPackageNameAndVersion("vite @ 7")).toEqual(["vite", "7"]);
-  });
-
-  it("should handle scoped packages with version", () => {
-    expect(getPackageNameAndVersion("@biomejs/biome@2.5.0")).toEqual([
-      "@biomejs/biome",
-      "2.5.0",
-    ]);
-    expect(getPackageNameAndVersion(" @biomejs/biome@2.5.0 ")).toEqual([
-      "@biomejs/biome",
-      "2.5.0",
-    ]);
-    expect(getPackageNameAndVersion("@biomejs/biome@ 2.5.0")).toEqual([
-      "@biomejs/biome",
-      "2.5.0",
-    ]);
-    expect(getPackageNameAndVersion("@biomejs/biome @ 2.5.0")).toEqual([
-      "@biomejs/biome",
-      "2.5.0",
-    ]);
-  });
-
-  it("should handle and empty and whitespace-only input", () => {
-    expect(getPackageNameAndVersion("")).toEqual([""]);
-    expect(getPackageNameAndVersion("  ")).toEqual([""]);
+describe("formatTraffic", () => {
+  it("handles terabytes", () => {
+    expect(formatTraffic(2_840_000_000_000)).toEqual("2.84 TB");
   });
 });

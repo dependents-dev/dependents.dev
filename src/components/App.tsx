@@ -1,3 +1,4 @@
+import { parsePackageSpec } from "npmeta";
 import { createSignal, For, onMount, Show } from "solid-js";
 
 import {
@@ -9,11 +10,7 @@ import { DEFAULT_MAX_DEPENDENTS, MAX_DEPENDENTS } from "#lib/constants";
 import { buildResultsMarkdownTable, getPackageNote } from "#lib/markdown";
 import type { AnalysisResult } from "#lib/results";
 import { buildAnalysisResults } from "#lib/results";
-import {
-  formatDownloads,
-  formatTraffic,
-  getPackageNameAndVersion,
-} from "#lib/util";
+import { formatDownloads, formatTraffic } from "#lib/util";
 
 import CheckmarkIcon from "./icon/Checkmark";
 import CopyIcon from "./icon/Copy";
@@ -111,7 +108,7 @@ export default function App() {
     onProgress(10, "Initializing...");
 
     try {
-      const [pkgName, requestedRange] = getPackageNameAndVersion(pkg);
+      const { name: pkgName, version: requestedRange } = parsePackageSpec(pkg);
       const dev = isDev();
       const limit = Math.min(
         MAX_DEPENDENTS,

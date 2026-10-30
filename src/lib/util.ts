@@ -21,18 +21,4 @@ const hash = (str: string) => {
   return (h >>> 0).toString(36);
 };
 
-type PackageNameAndVersion = readonly [
-  packageName: string,
-  version?: string | undefined,
-];
-
-function getPackageNameAndVersion(input: string): PackageNameAndVersion {
-  const trimmedInput = input.trim();
-  const atPos = trimmedInput.lastIndexOf("@");
-  if (atPos <= 0) return [trimmedInput];
-  const packageName = trimmedInput.slice(0, atPos).trim();
-  const version = trimmedInput.slice(atPos + 1).trim();
-  return [packageName, version];
-}
-
-export { formatDownloads, formatTraffic, getPackageNameAndVersion, hash };
+export { formatDownloads, formatTraffic, hash };
