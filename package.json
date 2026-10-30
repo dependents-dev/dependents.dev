@@ -31,7 +31,7 @@
     "@emnapi/runtime": "1.11.3",
     "@emnapi/wasi-threads": "1.2.3",
     "@jridgewell/trace-mapping": "0.3.31",
-    "@napi-rs/wasm-runtime": "1.2.3",
+    "@napi-rs/wasm-runtime": "1.2.6",
     "debug": "npm:obug@1.0.2",
     "esbuild": "0.28.2",
     "lightningcss": "1.33.0",
