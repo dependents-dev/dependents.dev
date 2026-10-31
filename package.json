@@ -45,7 +45,7 @@
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.4.4",
     "npmeta": "0.1.0",
-    "solid-js": "1.9.17",
+    "solid-js": "1.9.18",
     "tailwindcss": "4.3.3",
     "verkit": "0.5.0"
   },
