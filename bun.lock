@@ -8,7 +8,7 @@
         "@astrojs/solid-js": "7.1.2",
         "@tailwindcss/vite": "4.3.3",
         "astro": "7.4.4",
-        "npmeta": "0.1.0",
+        "npmeta": "0.3.0",
         "solid-js": "1.9.18",
         "tailwindcss": "4.3.3",
         "verkit": "0.5.0",
@@ -672,7 +672,7 @@
 
     "node-releases": ["node-releases@2.0.47", "", {}, "sha512-Uzmd6LXpouKo8EUK68IjH4+E01w/hXyV3R3g/geCJo+rXLNfh1xucB+LOzYEOQPSiUK3h/xZf0cQGcSsmyL2Og=="],
 
-    "npmeta": ["npmeta@0.1.0", "", {}, "sha512-hHcFtHvbXV7kuffxUDZAVaMhQd5HKmDbBFx6HKK5pUju1Miv90uYSDTSO3bl5at3IlNa1ZiMriKfnaGk7lZAAA=="],
+    "npmeta": ["npmeta@0.3.0", "", {}, "sha512-UdcU6HEzt2NxIlYhTXgbeOENqcQCfpGRkLEqZO5/DVSj4AkhWagLpfeK4xaMtMjqOm2CumgvKhINuCYsD87wMg=="],
 
     "nth-check": ["nth-check@2.1.1", "", { "dependencies": { "boolbase": "^1.0.0" } }, "sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w=="],
 
