@@ -39,7 +39,7 @@
     "esbuild": "0.28.2",
     "lightningcss": "1.33.0",
     "sax": "npm:es-sax@0.1.2",
-    "semver": "7.8.5",
+    "semver": "7.8.6",
     "sharp": "0.35.5",
     "unstorage": "2.0.0-beta.0",
   },
@@ -726,7 +726,7 @@
 
     "sax": ["es-sax@0.1.2", "", {}, "sha512-d4aVOk+sfAFHazZy8Bzzl6E/OD5U+pdpfj/iR+1NfddySzdZVHm8XDv/6EejkswzX0N5cUH7/l1m7RZmktQutg=="],
 
-    "semver": ["semver@7.8.5", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA=="],
+    "semver": ["semver@7.8.6", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-9lpSSU4Mly3mrtruwLs1eLK6+gzbzqeBFwRNjIjE+9LuDpWdYctrQlQ3ej1Ilgi7gknpsTRnPoLP8DpCHqHIJw=="],
 
     "seroval": ["seroval@1.6.11", "", {}, "sha512-hpb6XnMCGN/A+79Uf8V7/iTGkyyyazNn5X0CoCAp7Uy9vT3RT8jZ9GLcnxGoVjg3P8AArbe4ZVHq6C8oT2a0kA=="],
 
