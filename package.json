@@ -41,7 +41,7 @@
     "unstorage": "2.0.0-beta.0"
   },
   "dependencies": {
-    "@astrojs/solid-js": "7.1.2",
+    "@astrojs/solid-js": "7.1.5",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.4.4",
     "npmeta": "0.1.0",
